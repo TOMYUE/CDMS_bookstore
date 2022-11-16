@@ -1,5 +1,4 @@
 from sqlalchemy import Column, Integer, String, Text, Date, PrimaryKeyConstraint, ForeignKey
-from sqlalchemy.ext.declarative import declarative_base
 from .store import Store
 from .user import Buyer
 from .init import Base
@@ -26,6 +25,3 @@ class Order(Base):
     order_time = Column(String, nullable=False)
     status = Column(Integer, nullable=False)
     money = Column(Integer, nullable=False)
-
-def create_table():
-    Base.metadata.create_all()

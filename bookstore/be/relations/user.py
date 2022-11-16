@@ -1,6 +1,5 @@
 import sqlalchemy
 from sqlalchemy import Column, Integer, String, Text, Date, PrimaryKeyConstraint, ForeignKey
-from sqlalchemy.ext.declarative import declarative_base
 from .init import Base, engine
 
 
