@@ -1,28 +1,16 @@
 import logging
 import os
-from flask import Flask
-from flask import Blueprint
-from flask import request
+from fastapi import FastAPI
 from be.view import auth
 from be.view import seller
 from be.view import buyer
 from be.model.store import init_database
 
-bp_shutdown = Blueprint("shutdown", __name__)
+app = FastAPI()
 
-
-def shutdown_server():
-    func = request.environ.get("werkzeug.server.shutdown")
-    if func is None:
-        raise RuntimeError("Not running with the Werkzeug Server")
-    func()
-
-
-@bp_shutdown.route("/shutdown")
-def be_shutdown():
-    shutdown_server()
-    return "Server shutting down..."
-
+app.mount("/auth", auth.app),
+app.mount("/buyer", buyer.app),
+app.mount("/seller", seller.app)
 
 def be_run():
     this_path = os.path.dirname(__file__)
@@ -37,10 +25,5 @@ def be_run():
     )
     handler.setFormatter(formatter)
     logging.getLogger().addHandler(handler)
-
-    app = Flask(__name__)
-    app.register_blueprint(bp_shutdown)
-    app.register_blueprint(auth.bp_auth)
-    app.register_blueprint(seller.bp_seller)
-    app.register_blueprint(buyer.bp_buyer)
-    app.run()
+    import uvicorn
+    uvicorn.run(app, port=5000, host='127.0.0.1')

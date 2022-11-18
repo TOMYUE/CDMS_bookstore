@@ -1,7 +1,8 @@
 import sqlite3 as sqlite
 from be.model import error
 from be.model import db_conn
-
+from typing import *
+from typing_extensions import *
 
 class Seller(db_conn.DBConn):
 
@@ -44,7 +45,7 @@ class Seller(db_conn.DBConn):
             return 530, "{}".format(str(e))
         return 200, "ok"
 
-    def create_store(self, user_id: str, store_id: str) -> (int, str):
+    def create_store(self, user_id: str, store_id: str) -> Tuple[int, str]:
         try:
             if not self.user_id_exist(user_id):
                 return error.error_non_exist_user_id(user_id)

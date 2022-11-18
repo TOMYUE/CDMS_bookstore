@@ -4,6 +4,8 @@ import logging
 import sqlite3 as sqlite
 from be.model import error
 from be.model import db_conn
+from typing import *
+from typing_extensions import *
 
 # encode a json string like:
 #   {
@@ -66,7 +68,7 @@ class User(db_conn.DBConn):
             return error.error_exist_user_id(user_id)
         return 200, "ok"
 
-    def check_token(self, user_id: str, token: str) -> (int, str):
+    def check_token(self, user_id: str, token: str) -> Tuple[int, str]:
         cursor = self.conn.execute("SELECT token from user where user_id=?", (user_id,))
         row = cursor.fetchone()
         if row is None:
@@ -76,7 +78,7 @@ class User(db_conn.DBConn):
             return error.error_authorization_fail()
         return 200, "ok"
 
-    def check_password(self, user_id: str, password: str) -> (int, str):
+    def check_password(self, user_id: str, password: str) -> Tuple[int, str]:
         cursor = self.conn.execute("SELECT password from user where user_id=?", (user_id,))
         row = cursor.fetchone()
         if row is None:
@@ -87,7 +89,7 @@ class User(db_conn.DBConn):
 
         return 200, "ok"
 
-    def login(self, user_id: str, password: str, terminal: str) -> (int, str, str):
+    def login(self, user_id: str, password: str, terminal: str) -> Tuple[int, str, str]:
         token = ""
         try:
             code, message = self.check_password(user_id, password)
@@ -129,7 +131,7 @@ class User(db_conn.DBConn):
             return 530, "{}".format(str(e))
         return 200, "ok"
 
-    def unregister(self, user_id: str, password: str) -> (int, str):
+    def unregister(self, user_id: str, password: str) -> Tuple[int, str]:
         try:
             code, message = self.check_password(user_id, password)
             if code != 200:

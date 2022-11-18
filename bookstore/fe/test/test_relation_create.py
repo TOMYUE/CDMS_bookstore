@@ -1,6 +1,8 @@
 import pytest
 from be.relations.init import *
 
+from typing import *
+
 class TestCreateRelations:
     def test_create_relations(self):
         buyer_table = Table('Buyer', meta)

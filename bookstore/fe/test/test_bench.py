@@ -1,5 +1,6 @@
 from fe.bench.run import run_bench
 
+from typing import *
 
 def test_bench():
     try:

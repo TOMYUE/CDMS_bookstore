@@ -3,6 +3,7 @@ from fe.access.new_seller import register_new_seller
 from fe.access import book
 import uuid
 
+from typing import *
 
 class TestAddStockLevel:
     @pytest.fixture(autouse=True)

@@ -2,6 +2,7 @@ import pytest
 import uuid
 from fe.access.new_buyer import register_new_buyer
 
+from typing import *
 
 class TestAddFunds:
     @pytest.fixture(autouse=True)

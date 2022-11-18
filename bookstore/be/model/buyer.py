@@ -4,13 +4,13 @@ import json
 import logging
 from be.model import db_conn
 from be.model import error
-
+from typing import List, Tuple
 
 class Buyer(db_conn.DBConn):
     def __init__(self):
         db_conn.DBConn.__init__(self)
 
-    def new_order(self, user_id: str, store_id: str, id_and_count: [(str, int)]) -> (int, str, str):
+    def new_order(self, user_id: str, store_id: str, id_and_count: List[Tuple[str, int]]) -> Tuple[int, str, str]:
         order_id = ""
         try:
             if not self.user_id_exist(user_id):
@@ -63,7 +63,7 @@ class Buyer(db_conn.DBConn):
 
         return 200, "ok", order_id
 
-    def payment(self, user_id: str, password: str, order_id: str) -> (int, str):
+    def payment(self, user_id: str, password: str, order_id: str) -> Tuple[int, str]:
         conn = self.conn
         try:
             cursor = conn.execute("SELECT order_id, user_id, store_id FROM new_order WHERE order_id = ?", (order_id,))
@@ -137,7 +137,7 @@ class Buyer(db_conn.DBConn):
 
         return 200, "ok"
 
-    def add_funds(self, user_id, password, add_value) -> (int, str):
+    def add_funds(self, user_id, password, add_value) -> Tuple[int, str]:
         try:
             cursor = self.conn.execute("SELECT password  from user where user_id=?", (user_id,))
             row = cursor.fetchone()

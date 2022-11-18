@@ -6,6 +6,7 @@ from fe.access.new_buyer import register_new_buyer
 from fe.access.book import Book
 import uuid
 
+from typing import *
 
 class TestPayment:
     seller_id: str

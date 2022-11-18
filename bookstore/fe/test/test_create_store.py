@@ -3,6 +3,7 @@ import pytest
 from fe.access.new_seller import register_new_seller
 import uuid
 
+from typing import *
 
 class TestCreateStore:
     @pytest.fixture(autouse=True)

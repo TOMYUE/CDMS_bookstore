@@ -5,6 +5,7 @@ import pytest
 from fe.access import auth
 from fe import conf
 
+from typing import *
 
 class TestRegister:
     @pytest.fixture(autouse=True)

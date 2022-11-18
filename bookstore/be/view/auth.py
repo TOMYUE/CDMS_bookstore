@@ -1,53 +1,40 @@
-from flask import Blueprint
-from flask import request
-from flask import jsonify
+from fastapi import FastAPI
+from fastapi.requests import *
+from fastapi.responses import JSONResponse
 from be.model import user
+from pydantic import BaseModel
 
-bp_auth = Blueprint("auth", __name__, url_prefix="/auth")
+app = FastAPI()
 
+class LoginForm(BaseModel):
+    user_id: str
+    password: str
+    terminal: str
 
-@bp_auth.route("/login", methods=["POST"])
-def login():
-    user_id = request.json.get("user_id", "")
-    password = request.json.get("password", "")
-    terminal = request.json.get("terminal", "")
+@app.post("/login")
+def login(form: LoginForm):
     u = user.User()
-    code, message, token = u.login(user_id=user_id, password=password, terminal=terminal)
-    return jsonify({"message": message, "token": token}), code
+    code, message, token = u.login(
+        user_id=form.user_id, 
+        password=form.password, 
+        terminal=form.terminal
+    )
+    return JSONResponse({"message": message, "token": token}, status_code=code)
 
-
-@bp_auth.route("/logout", methods=["POST"])
+@app.post("/logout")
 def logout():
-    user_id: str = request.json.get("user_id")
-    token: str = request.headers.get("token")
-    u = user.User()
-    code, message = u.logout(user_id=user_id, token=token)
-    return jsonify({"message": message}), code
+    return "No yet implemented"
 
-
-@bp_auth.route("/register", methods=["POST"])
+@app.post("/register")
 def register():
-    user_id = request.json.get("user_id", "")
-    password = request.json.get("password", "")
-    u = user.User()
-    code, message = u.register(user_id=user_id, password=password)
-    return jsonify({"message": message}), code
+    return "No yet implemented"
 
 
-@bp_auth.route("/unregister", methods=["POST"])
+@app.post("/unregister")
 def unregister():
-    user_id = request.json.get("user_id", "")
-    password = request.json.get("password", "")
-    u = user.User()
-    code, message = u.unregister(user_id=user_id, password=password)
-    return jsonify({"message": message}), code
+    return "No yet implemented"
 
 
-@bp_auth.route("/password", methods=["POST"])
+@app.post("/password")
 def change_password():
-    user_id = request.json.get("user_id", "")
-    old_password = request.json.get("oldPassword", "")
-    new_password = request.json.get("newPassword", "")
-    u = user.User()
-    code, message = u.change_password(user_id=user_id, old_password=old_password, new_password=new_password)
-    return jsonify({"message": message}), code
+    return "No yet implemented"
