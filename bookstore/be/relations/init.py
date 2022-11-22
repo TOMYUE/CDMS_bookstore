@@ -168,7 +168,7 @@ class StoreOwner(Base):
 
 def db_session():
     """get db session for following operations"""
-    return DBSession
+    return DBSession()
 
 
 def create_table():
