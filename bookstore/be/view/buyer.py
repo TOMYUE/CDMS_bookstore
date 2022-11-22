@@ -5,6 +5,9 @@ from typing_extensions import *
 
 app = FastAPI()
 
+# class order
+
+
 @app.post("/new_order")
 def new_order():
     return "No yet implemented"
@@ -17,4 +20,5 @@ def payment():
 
 @app.post("/add_funds")
 def add_funds():
+
     return "No yet implemented"
