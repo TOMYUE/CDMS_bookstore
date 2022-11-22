@@ -48,6 +48,7 @@ class BookDB:
     def get_book_info(self, start, size) -> [Book]:
         books = []
         conn = sqlite.connect(self.book_db)
+        # TODO: Convert this to the sqlORM style
         cursor = conn.execute(
             "SELECT id, title, author, "
             "publisher, original_title, "

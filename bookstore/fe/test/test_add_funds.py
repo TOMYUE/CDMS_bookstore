@@ -1,5 +1,6 @@
 import pytest
 import uuid
+import random
 from fe.access.new_buyer import register_new_buyer
 
 from typing import *
@@ -7,9 +8,12 @@ from typing import *
 class TestAddFunds:
     @pytest.fixture(autouse=True)
     def pre_run_initialization(self):
-        self.user_id = "test_add_funds_{}".format(str(uuid.uuid1()))
-        self.password = self.user_id
-        self.buyer = register_new_buyer(self.user_id, self.password)
+        self.user_id = int(uuid.uuid1())
+        self.password = str(self.user_id)
+        self.uname = "test_add_funds_"
+        self.account = "test_add_funds_account"
+        self.balance = round(random.uniform(500, 1000), 6)
+        self.buyer = register_new_buyer(self.user_id, self.password, self.uname, self.account, self.balance)
         yield
 
     def test_ok(self):
