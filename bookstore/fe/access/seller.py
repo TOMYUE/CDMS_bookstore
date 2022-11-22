@@ -25,7 +25,7 @@ class Seller:
         r = requests.post(url, headers=headers, json=json)
         return r.status_code
 
-    def add_book(self, store_id: str, stock_level: int, book_info: book.Book) -> int:
+    def add_book(self, store_id: int, stock_level: int, book_info: book.Book) -> int:
         json = {
             "user_id": self.seller_id,
             "store_id": store_id,
@@ -38,7 +38,7 @@ class Seller:
         r = requests.post(url, headers=headers, json=json)
         return r.status_code
 
-    def add_stock_level(self, seller_id: str, store_id: str, book_id: str, add_stock_num: int) -> int:
+    def add_stock_level(self, seller_id: int, store_id: int, book_id: str, add_stock_num: int) -> int:
         json = {
             "user_id": seller_id,
             "store_id": store_id,

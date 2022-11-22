@@ -1,3 +1,5 @@
+import random
+
 import pytest
 
 from fe.access.buyer import Buyer
@@ -8,11 +10,12 @@ import uuid
 
 from typing import *
 
+
 class TestPayment:
-    seller_id: str
-    store_id: str
-    buyer_id: str
-    password:str
+    seller_id: int
+    store_id: int
+    buyer_id: int
+    password: str
     buy_book_info_list: [Book]
     total_price: int
     order_id: str
@@ -20,15 +23,28 @@ class TestPayment:
 
     @pytest.fixture(autouse=True)
     def pre_run_initialization(self):
-        self.seller_id = "test_payment_seller_id_{}".format(str(uuid.uuid1()))
-        self.store_id = "test_payment_store_id_{}".format(str(uuid.uuid1()))
-        self.buyer_id = "test_payment_buyer_id_{}".format(str(uuid.uuid1()))
-        self.password = self.seller_id
+        # initialization of the seller and buyer
+        self.seller_id = int(uuid.uuid1())
+        self.buyer_id = int(uuid.uuid1())
+        self.store_id = int(uuid.uuid1())
+        # pwd of the buyer and seller
+        self.buyer_password = "test_new_order_buyer_" + str(self.buyer_id)
+        self.seller_password = "test_new_order_seller_" + str(self.seller_id)
+        # uname of the buyer and seller
+        self.buyer_uname = "test_new_order_buyer_" + str(self.buyer_id)
+        self.seller_uname = "test_new_order_seller_" + str(self.seller_id)
+        # account of the buyer and seller
+        self.buyer_account = "test_new_order_buyer_" + str(self.buyer_id)
+        self.seller_account = "test_new_order_seller_" + str(self.seller_id)
+        # balance of the buyer and seller
+        self.buyer_balance = round(random.uniform(1000, 1500), 6)
+        self.seller_balance = round(random.uniform(1000, 1500), 6)
+        # initialization of book related info
         gen_book = GenBook(self.seller_id, self.store_id)
         ok, buy_book_id_list = gen_book.gen(non_exist_book_id=False, low_stock_level=False, max_book_count=5)
         self.buy_book_info_list = gen_book.buy_book_info_list
         assert ok
-        b = register_new_buyer(self.buyer_id, self.password)
+        b = register_new_buyer(self.buyer_id, self.buyer_password, self.buyer_uname, self.buyer_account, self.buyer_balance)
         self.buyer = b
         code, self.order_id = b.new_order(self.store_id, buy_book_id_list)
         assert code == 200

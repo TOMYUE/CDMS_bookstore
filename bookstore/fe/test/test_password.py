@@ -1,3 +1,4 @@
+import random
 import uuid
 
 import pytest
@@ -12,12 +13,15 @@ class TestPassword:
     def pre_run_initialization(self):
         self.auth = auth.Auth(conf.URL)
         # register a user
-        self.user_id = "test_password_{}".format(str(uuid.uuid1()))
-        self.old_password = "old_password_" + self.user_id
-        self.new_password = "new_password_" + self.user_id
-        self.terminal = "terminal_" + self.user_id
+        self.user_id = int(uuid.uuid1())
+        self.old_password = "old_password_" + str(self.user_id)
+        self.new_password = "new_password_" + str(self.user_id)
+        self.uname = "test_pwd_" + str(self.user_id)
+        self.account = "test_pwd_{}" + str(self.user_id)
+        self.balance = round(random.uniform(1000, 10000), 6)
+        self.terminal = "terminal_" + str(self.user_id)
 
-        assert self.auth.register(self.user_id, self.old_password) == 200
+        assert self.auth.register_buyer(self.user_id, self.old_password, self.uname, self.account, self.balance) == 200
         yield
 
     def test_ok(self):
@@ -41,7 +45,7 @@ class TestPassword:
         assert code != 200
 
     def test_error_user_id(self):
-        code = self.auth.password(self.user_id + "_x", self.old_password, self.new_password)
+        code = self.auth.password(self.user_id, self.old_password, self.new_password)
         assert code != 200
 
         code, new_token = self.auth.login(self.user_id, self.new_password, self.terminal)

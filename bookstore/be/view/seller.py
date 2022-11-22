@@ -6,6 +6,7 @@ app = FastAPI()
 
 @app.post("/create_store")
 def seller_create_store():
+    # TODO:
     raise "Not implemented yet"
 
 @app.post("/add_book")

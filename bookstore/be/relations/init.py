@@ -16,7 +16,6 @@ engine = create_engine(SQLALCHEMY_DATABASE_URL,
 )
 # connect to local database
 DBSession = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-session = DBSession()
 # create declarative_base instance
 Base = declarative_base()
 # create a metadata object
@@ -51,12 +50,12 @@ class Seller(Base):
     """
     The seller relation object including six attributes
 
-    uid: the id of the salers, primary key
-    sid: the id of the buyers' stores, foreign key
-    uname: the name of the buyers
-    pwd: the password of the buyers
-    account: the account of the buyers' bank or other account using for deals
-    balance: the total balance of the buyers account
+    uid: the id of the sellers, primary key
+    sid: the id of the sellers' stores, foreign key
+    uname: the name of the sellersx
+    pwd: the password of the sellers
+    account: the account of the sellers' bank or other account using for deals
+    balance: the total balance of the sellers account
     """
 
     # relation name
@@ -169,7 +168,7 @@ class StoreOwner(Base):
 
 def db_session():
     """get db session for following operations"""
-    return session
+    return DBSession
 
 
 def create_table():
