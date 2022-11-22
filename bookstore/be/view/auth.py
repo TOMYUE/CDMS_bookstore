@@ -6,10 +6,12 @@ from pydantic import BaseModel
 
 app = FastAPI()
 
+
 class LoginForm(BaseModel):
     user_id: str
     password: str
     terminal: str
+
 
 @app.post("/login")
 def login(form: LoginForm):
@@ -21,9 +23,11 @@ def login(form: LoginForm):
     )
     return JSONResponse({"message": message, "token": token}, status_code=code)
 
+
 @app.post("/logout")
 def logout():
     return "No yet implemented"
+
 
 @app.post("/register")
 def register():
