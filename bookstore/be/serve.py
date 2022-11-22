@@ -13,7 +13,7 @@ app.mount("/buyer", buyer.app),
 app.mount("/seller", seller.app)
 
 
-def be_run():
+def be_run(test: bool):
     this_path = os.path.dirname(__file__)
     parent_path = os.path.dirname(this_path)
     log_file = os.path.join(parent_path, "app.log")

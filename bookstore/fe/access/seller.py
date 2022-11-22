@@ -2,7 +2,7 @@ import requests
 from urllib.parse import urljoin
 from fe.access import book
 from fe.access.auth import Auth
-
+import json as json_tool
 
 class Seller:
     def __init__(self, url_prefix, seller_id: str, password: str):
@@ -36,7 +36,7 @@ class Seller:
         url = urljoin(self.url_prefix, "add_book")
         headers = {"token": self.token}
         r = requests.post(url, headers=headers, json=json)
-        return r.status_code
+        return r.status_code, r.content
 
     def add_stock_level(self, seller_id: int, store_id: int, book_id: str, add_stock_num: int) -> int:
         json = {
@@ -49,4 +49,4 @@ class Seller:
         url = urljoin(self.url_prefix, "add_stock_level")
         headers = {"token": self.token}
         r = requests.post(url, headers=headers, json=json)
-        return r.status_code
+        return r.status_code, json_tool.loads(r.content)

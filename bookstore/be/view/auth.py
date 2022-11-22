@@ -29,11 +29,9 @@ def logout():
 def register():
     return "No yet implemented"
 
-
 @app.post("/unregister")
 def unregister():
     return "No yet implemented"
-
 
 @app.post("/password")
 def change_password():

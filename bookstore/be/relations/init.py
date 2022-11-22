@@ -68,6 +68,18 @@ class Seller(Base):
     account = Column(String, nullable=False)
     balance = Column(Integer, nullable=False)
 
+class StoreOwner(Base):
+    """
+    The store and owner relation contain two attributes
+    """
+
+    # relation name
+    __tablename__ = 'StoreOwner'
+    __table_args__ = {'extend_existing': True}
+
+    # attribute name
+    sid = Column(Integer, primary_key=True, unique=True)
+    uid = Column(Integer, ForeignKey(Seller.uid))
 
 class Store(Base):
     """
@@ -87,9 +99,9 @@ class Store(Base):
     __tablename__ = 'Store'
 
     # attributes
-    sid = Column(Integer, primary_key=True, unique=True)
+    sid = Column(Integer, ForeignKey(StoreOwner.sid))
     uid = Column(Integer, ForeignKey(Seller.uid), nullable=False)
-    bid = Column(String,  primary_key=True, unique=True, nullable=False)
+    bid = Column(String, primary_key=True, unique=True, nullable=False)
     inventory_quantity = Column(Integer, nullable=False)
     title = Column(String, nullable=False)
     author = Column(String, nullable=True)                      # can have no author
@@ -101,11 +113,12 @@ class Store(Base):
     price = Column(Integer, nullable=False)
     currency_unit = Column(String, nullable=False)
     binding = Column(String, nullable=False)
-    isbn = Column(String, unique=True, nullable=False)
+    isbn = Column(String, nullable=False)
     author_intro = Column(String, nullable=True)                # can have no intro
     book_intro = Column(String, nullable=True)                  # can have no intro
     content = Column(String, nullable=True)                     # can have no content
     tags = Column(String, nullable=True)                        # can have no tag
+    pictures = Column(String, nullable=True)                    # can have no picture
 
 
 class Deal(Base):
@@ -126,7 +139,7 @@ class Deal(Base):
     # attributes
     did = Column(Integer, autoincrement=True, primary_key=True, unique=True, nullable=True)
     uid = Column(Integer, ForeignKey(Buyer.uid))
-    sid = Column(Integer, ForeignKey(Store.sid))
+    sid = Column(Integer, ForeignKey(StoreOwner.sid))
     order_time = Column(String, nullable=False)
     status = Column(Integer, nullable=False)
     money = Column(Integer, nullable=False)
@@ -150,22 +163,6 @@ class DealBook(Base):
     bid = Column(String, ForeignKey(Store.bid))
     num = Column(Integer, nullable=False)
 
-
-class StoreOwner(Base):
-    """
-    The store and owner relation contain two attributes
-    """
-
-    # relation name
-    __tablename__ = 'StoreOwner'
-    __table_args__ = {'extend_existing': True}
-
-    # attribute name
-    id = Column(Integer, autoincrement=True, primary_key=True, unique=True)
-    sid = Column(Integer, ForeignKey(Store.sid))
-    uid = Column(Integer, ForeignKey(Seller.uid))
-
-
 def db_session():
     """get db session for following operations"""
     return DBSession()
@@ -185,15 +182,16 @@ def drop_all_table():
     :return:
     """
     rm_sql = '''
-    DROP TABLE IF EXISTS Buyer CASCADE ;
-    DROP TABLE IF EXISTS Seller CASCADE ;
-    DROP TABLE IF EXISTS Store CASCADE ;
-    DROP TABLE IF EXISTS Deal CASCADE ;
-    DROP TABLE IF EXISTS DealBook CASCADE ;
-    DROP TABLE IF EXISTS StoreOwner CASCADE ;
+    DROP TABLE IF EXISTS "Buyer" CASCADE ;
+    DROP TABLE IF EXISTS "Seller" CASCADE ;
+    DROP TABLE IF EXISTS "Store" CASCADE ;
+    DROP TABLE IF EXISTS "Deal" CASCADE ;
+    DROP TABLE IF EXISTS "DealBook" CASCADE ;
+    DROP TABLE IF EXISTS "StoreOwner" CASCADE ;
     '''
-    engine.execute(rm_sql)
+    with db_session() as session:
+        session.execute(rm_sql)
+        session.commit()
 
-
+drop_all_table()
 create_table()
-# drop_all_table()
