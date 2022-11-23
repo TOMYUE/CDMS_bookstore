@@ -1,6 +1,7 @@
 from be.relations.init import *
 from typing import *
 
+
 # uid: user_id
 # sid: store_id
 def create_store(uid, sid):
@@ -11,6 +12,7 @@ def create_store(uid, sid):
         return 200, "Success: a new store"
     except Exception as e:
         return 500, f"Failure: {e}"
+
 
 # uid: user_id
 # sid: store_id
