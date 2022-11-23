@@ -45,6 +45,8 @@ class Buyer(Base):
     pwd = Column(String, nullable=False)
     account = Column(String, nullable=False)
     balance = Column(Integer, nullable=False)
+    token = Column(String, nullable=False)
+    terminal = Column(String, nullable=False)
 
 
 class Seller(Base):
@@ -68,6 +70,8 @@ class Seller(Base):
     pwd = Column(String, nullable=False)
     account = Column(String, nullable=False)
     balance = Column(Integer, nullable=False)
+    token = Column(String, nullable=False)
+    terminal = Column(String, nullable=False)
 
 
 class StoreOwner(Base):
