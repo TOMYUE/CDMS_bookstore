@@ -104,7 +104,7 @@ class ChangePwdForm(BaseModel):
     new_password: str
 
 @app.post("/seller/password")
-def change_password(form: ChangePwdForm):
+def sellse_change_password(form: ChangePwdForm):
     code, message = user.seller_change_password(
         user_id,
         old_password,
@@ -113,7 +113,7 @@ def change_password(form: ChangePwdForm):
     return JSONResponse({"message":message},status_code=code)
 
 @app.post("/buyer/password")
-def change_password(form: ChangePwdForm):
+def buyer_change_password(form: ChangePwdForm):
     code, message = user.buyer_change_password(
         user_id,
         old_password=old_password,
