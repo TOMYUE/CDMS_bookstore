@@ -31,7 +31,7 @@ class User:
         if user is None or pwd != user.pwd:
             code, message = error.error_authorization_fail()
             return code, message, token
-        token = jwt_encoder(uid, terminal)
+        token = jwt_encode(uid, terminal)
         self.session.execute("UPDATE Seller set token= '%s' , terminal = '%s' where uid = '%s'" % (token, terminal, uid))
         self.session.commit()
         return 200, "ok", token
@@ -42,7 +42,7 @@ class User:
         if user is None or pwd != user.pwd:
             code, message = error.error_authorization_fail()
             return code, message, token
-        token = jwt_encoder(uid, terminal)
+        token = jwt_encode(uid, terminal)
         self.session.execute("UPDATE Buyer set token= '%s' , terminal = '%s' where uid = '%s'" % (token, terminal, uid))
         self.session.commit()
         return 200, "ok", token
