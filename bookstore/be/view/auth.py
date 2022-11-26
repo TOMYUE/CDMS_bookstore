@@ -40,16 +40,16 @@ class LogoutForm(BaseModel):
 @app.post("/seller/logout")
 def seller_logout(form: LogoutForm):
     code, message = user.seller_logout(
-        user_id,
-        token
+        form.user_id,
+        form.token
     )
     return JSONResponse({"message":message},status_code=code)
 
 @app.post("/buyer/logout")
 def buyer_logout(form: LogoutForm):
     code, message = user.buyer_logout(
-        user_id,
-        token
+        form.user_id,
+        form.token
     )
     return JSONResponse({"message":message},status_code=code)
 
@@ -85,16 +85,16 @@ class UnregisterForm(BaseModel):
 @app.post("/seller/unregister")
 def seller_unregister(form:UnregisterForm):
     code, message = user.seller_unregister(
-        user_id,
-        password
+        form.user_id,
+        form.password
     )
     return JSONResponse({"message":message},status_code=code)
 
 @app.post("/buyer/unregister")
 def seller_unregister(form:UnregisterForm):
     code, message = user.buyer_unregister(
-        user_id,
-        password
+        form.user_id,
+        form.password
     )
     return JSONResponse({"message":message},status_code=code)
 
@@ -106,17 +106,17 @@ class ChangePwdForm(BaseModel):
 @app.post("/seller/password")
 def sellse_change_password(form: ChangePwdForm):
     code, message = user.seller_change_password(
-        user_id,
-        old_password,
-        new_password
+        form.user_id,
+        form.old_password,
+        form.new_password
     )
     return JSONResponse({"message":message},status_code=code)
 
 @app.post("/buyer/password")
 def buyer_change_password(form: ChangePwdForm):
     code, message = user.buyer_change_password(
-        user_id,
-        old_password=old_password,
-        new_password
+        form.user_id,
+        form.old_password,
+        form.new_password
     )
     return JSONResponse({"message":message},status_code=code)

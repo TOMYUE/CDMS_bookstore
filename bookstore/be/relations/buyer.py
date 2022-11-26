@@ -2,8 +2,6 @@ import time
 
 from be.relations.init import *
 from typing import *
-from sqlalchemy import and_,or_
-from sqlalchemy import func, extract
 
 
 # status of the deal, using 0, 1, 2, 3 to denote each stage
