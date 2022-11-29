@@ -5,11 +5,11 @@
 from be.relations.init import *
 from typing import *
 from be.model import error
-import  jwt
+import jwt
 import time
 import sqlalchemy
 
-def jwt_encode(user_id: str, terminal: str) -> str:
+def jwt_encode(user_id: int, terminal: str) -> str:
     encoded = jwt.encode(
         {"user_id": user_id, "terminal": terminal, "timestamp": time.time()},
         key=user_id,
@@ -17,13 +17,13 @@ def jwt_encode(user_id: str, terminal: str) -> str:
     )
     return encoded.decode("utf-8")
 
-def jwt_decode(encoded_token, user_id: str) -> str:
+def jwt_decode(encoded_token, user_id: int) -> str:
     decoded = jwt.decode(encoded_token, key=user_id, algorithms="HS256")
     return decoded
 
 class User:
     def __init__(self):
-        db.__init__(self)
+        self.session = db_session()
 
     def seller_login(self, uid:int, pwd:str, terminal:str):
         token = ""
@@ -58,7 +58,7 @@ class User:
             self.session.execute("UPDATE Seller SET token='%s' WHERE uid='%s'" %(newtoken, uid))
             self.session.commit()
             return 200, "ok"
-        except sqlalchemy.exc.IntegrityError:
+        except Exception as e:
             return error.error_authorization_fail()
 
     def buyer_logout(self, uid: int, token: str):
@@ -72,26 +72,26 @@ class User:
             self.session.execute("UPDATE Buyer SET token='%s' WHERE uid='%s'" % (newtoken, uid))
             self.session.commit()
             return 200, "ok"
-        except sqlalchemy.exc.IntegrityError:
+        except Exception as e:
             return error.error_authorization_fail()
 
-    def seller_register(self, uid:int, pwd:str):
+    def seller_register(self, uid: int, uname: str, pwd: str):
         terminal = "terminal_{}".format(str(time.time()))
         try:
             token = ""
             self.session.execute("INSERT INTO Seller(uid, uname, pwd, account,balance, token, terminal) values(:uid, :pwd, :account, 0, :token, :terminal",{"uid":uid, "uname":uname, "pwd":pwd,"account":"account_name","token":token,"terminal":terminal})
             self.session.commit()
-        except sqlalchemy.exc.IntegrityError:
-            return error.error_non_exist_user_id()
+        except Exception as e:
+            return error.error_non_exist_user_id(uid)
 
-    def buyer_register(self, uid:int, pwd:str):
+    def buyer_register(self, uid:int, uname: str, pwd: str):
         terminal = "terminal_{}".format(str(time.time()))
         try:
             token = ""
-            self.session.execute("INSERT INTO Buyer(uid, uname, pwd, account,balance, token, terminal) values(:uid, :pwd, :account, 0, :token, :terminal",{"uid":uid, "uname":uname, "pwd":pwd,"account":"account_name","token":token,"terminal":terminal})
+            self.session.execute("INSERT INTO Buyer(uid, uname, pwd, account, balance, token, terminal) values(:uid, :pwd, :account, 0, :token, :terminal",{"uid":uid, "uname":uname, "pwd":pwd,"account":"account_name","token":token,"terminal":terminal})
             self.session.commit()
-        except sqlalchemy.exc.IntegrityError:
-            return error.error_non_exist_user_id()
+        except Exception as e:
+            return error.error_non_exist_user_id(uid)
 
     def seller_unregister(self, uid:int, pwd:str):
         user = self.session.execute("SELECT pwd FROM  Seller WHERE uid=:uid",{"uid": uid}).fetchone()
