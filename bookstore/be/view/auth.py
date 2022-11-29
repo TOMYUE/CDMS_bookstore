@@ -3,36 +3,120 @@ from fastapi.requests import *
 from fastapi.responses import JSONResponse
 from be.model import user
 from pydantic import BaseModel
+import sqlalchemy
+from typing import *
+from be.relations import user
 
 app = FastAPI()
 
 class LoginForm(BaseModel):
-    user_id: str
+    user_id: int
     password: str
     terminal: str
 
-@app.post("/login")
-def login(form: LoginForm):
-    u = user.User()
-    code, message, token = u.login(
-        user_id=form.user_id, 
-        password=form.password, 
-        terminal=form.terminal
+@app.post("/seller/login")
+def seller_login(form: LoginForm):
+    code, message, token = user.seller_login(
+        form.user_id,
+        form.password,
+        form.terminal
     )
     return JSONResponse({"message": message, "token": token}, status_code=code)
 
-@app.post("/logout")
-def logout():
-    return "No yet implemented"
+@app.post("/buyer/login")
+def buyer_login(form: LoginForm):
+    code, message, token = user.buyer_login(
+        form.user_id,
+        form.password,
+        form.terminal
+    )
+    return JSONResponse({"message": message, "token": token}, status_code=code)
 
-@app.post("/register")
-def register():
-    return "No yet implemented"
 
-@app.post("/unregister")
-def unregister():
-    return "No yet implemented"
+class LogoutForm(BaseModel):
+    user_id: int
+    token: str
 
-@app.post("/password")
-def change_password():
-    return "No yet implemented"
+@app.post("/seller/logout")
+def seller_logout(form: LogoutForm):
+    code, message = user.seller_logout(
+        form.user_id,
+        form.token
+    )
+    return JSONResponse({"message":message},status_code=code)
+
+@app.post("/buyer/logout")
+def buyer_logout(form: LogoutForm):
+    code, message = user.buyer_logout(
+        form.user_id,
+        form.token
+    )
+    return JSONResponse({"message":message},status_code=code)
+
+
+class RegisterForm(BaseModel):
+    user_id: int
+    uname: str
+    password: str
+
+@app.post("/seller/register")
+def seller_register(form:RegisterForm):
+    code, message = user.seller_register(
+        form.user_id,
+        form.uname,
+        form.password
+    )
+    return JSONResponse({"message":message}, status_code=code)
+
+@app.post("/buyer/register")
+def buyer_register(form:RegisterForm):
+    code, message = user.buyer_register(
+        form.user_id,
+        form.uname,
+        form.password
+    )
+    return JSONResponse({"message":message}, status_code=code)
+
+
+class UnregisterForm(BaseModel):
+    user_id: int
+    password: str
+
+@app.post("/seller/unregister")
+def seller_unregister(form:UnregisterForm):
+    code, message = user.seller_unregister(
+        form.user_id,
+        form.password
+    )
+    return JSONResponse({"message":message},status_code=code)
+
+@app.post("/buyer/unregister")
+def seller_unregister(form:UnregisterForm):
+    code, message = user.buyer_unregister(
+        form.user_id,
+        form.password
+    )
+    return JSONResponse({"message":message},status_code=code)
+
+class ChangePwdForm(BaseModel):
+    user_id: int
+    old_password: str
+    new_password: str
+
+@app.post("/seller/password")
+def sellse_change_password(form: ChangePwdForm):
+    code, message = user.seller_change_password(
+        form.user_id,
+        form.old_password,
+        form.new_password
+    )
+    return JSONResponse({"message":message},status_code=code)
+
+@app.post("/buyer/password")
+def buyer_change_password(form: ChangePwdForm):
+    code, message = user.buyer_change_password(
+        form.user_id,
+        form.old_password,
+        form.new_password
+    )
+    return JSONResponse({"message":message},status_code=code)

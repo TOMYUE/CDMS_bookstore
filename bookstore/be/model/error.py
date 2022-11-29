@@ -10,9 +10,9 @@ error_code = {
     517: "stock level low, book id {}",
     518: "invalid order id {}",
     519: "not sufficient funds, order id {}",
-    520: "",
-    521: "",
-    522: "",
+    520: "invalid add vlue, user id {}",
+    521: "no such book sell in store {}",
+    522: "no such deal exist",
     523: "",
     524: "",
     525: "",
@@ -54,8 +54,20 @@ def error_invalid_order_id(order_id):
     return 518, error_code[518].format(order_id)
 
 
-def error_not_sufficient_funds(order_id):
-    return 519, error_code[518].format(order_id)
+def error_not_sufficient_funds(store_id):
+    return 519, error_code[519].format(store_id)
+
+
+def error_invalid_add_value(user_id):
+    return 520, error_code[520].format(user_id)
+
+
+def error_no_book_sell_in_store(store_id):
+    return 521, error_code[521].format(store_id)
+
+
+def error_user_no_deal_exist(user_id):
+    return 533, error_code[522].format(user_id)
 
 
 def error_authorization_fail():

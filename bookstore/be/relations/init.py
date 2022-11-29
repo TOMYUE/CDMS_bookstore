@@ -3,6 +3,7 @@ from sqlalchemy import create_engine, MetaData, Table, inspect
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
+from be.model.error import *
 
 # SQLALCHEMY_DATABASE_URL = "postgresql://postgres:123456@localhost:5432/tangyue"
 SQLALCHEMY_DATABASE_URL = "postgresql://stu10205501461:" \
@@ -44,6 +45,8 @@ class Buyer(Base):
     pwd = Column(String, nullable=False)
     account = Column(String, nullable=False)
     balance = Column(Integer, nullable=False)
+    token = Column(String, nullable=False)
+    terminal = Column(String, nullable=False)
 
 
 class Seller(Base):
@@ -67,6 +70,9 @@ class Seller(Base):
     pwd = Column(String, nullable=False)
     account = Column(String, nullable=False)
     balance = Column(Integer, nullable=False)
+    token = Column(String, nullable=False)
+    terminal = Column(String, nullable=False)
+
 
 class StoreOwner(Base):
     """
@@ -80,6 +86,7 @@ class StoreOwner(Base):
     # attribute name
     sid = Column(Integer, primary_key=True, unique=True)
     uid = Column(Integer, ForeignKey(Seller.uid))
+
 
 class Store(Base):
     """
@@ -163,6 +170,7 @@ class DealBook(Base):
     bid = Column(String, ForeignKey(Store.bid))
     num = Column(Integer, nullable=False)
 
+
 def db_session():
     """get db session for following operations"""
     return DBSession()
@@ -179,7 +187,6 @@ def create_table():
 def drop_all_table():
     """
     Remove all exists table
-    :return:
     """
     rm_sql = '''
     DROP TABLE IF EXISTS "Buyer" CASCADE ;
@@ -192,6 +199,40 @@ def drop_all_table():
     with db_session() as session:
         session.execute(rm_sql)
         session.commit()
+
+
+def buyer_id_exist(session, buyer_id):
+    """If buyer id exists return true, else return false"""
+    try:
+        with session.begin():
+            exists = session.query(Buyer).filter(Buyer.uid == buyer_id).first() is not None
+            session.commit()
+        return exists
+    except Exception as e:
+        return error_non_exist_user_id(buyer_id)
+
+
+def book_id_exist(session, book_id):
+    """if book id exists return true, else return false"""
+    try:
+        with session.begin():
+            exists = session.query(Store.bid).filter(Store.bid == book_id).first() is not None
+            session.commit()
+        return exists
+    except Exception as e:
+        return error_non_exist_book_id(book_id)
+
+
+def store_id_exist(session, store_id):
+    """if store id exists return true, else return false"""
+    try:
+        with session.begin():
+            exists = session.query(StoreOwner.sid).filter(StoreOwner.sid == store_id).first() is not None
+            session.commit()
+        return exists
+    except Exception as e:
+        return error_non_exist_store_id(store_id)
+
 
 drop_all_table()
 create_table()

@@ -5,12 +5,13 @@ import logging
 from be.model import db_conn
 from be.model import error
 from typing import List, Tuple
+from be.relations.init import *
 
 class Buyer(db_conn.DBConn):
     def __init__(self):
         db_conn.DBConn.__init__(self)
 
-    def new_order(self, user_id: str, store_id: str, id_and_count: List[Tuple[str, int]]) -> Tuple[int, str, str]:
+    def new_order(self, user_id: int, store_id: int, id_and_count: List[Tuple[int, int]]) -> Tuple[int, str, str]:
         order_id = ""
         try:
             if not self.user_id_exist(user_id):
@@ -63,7 +64,7 @@ class Buyer(db_conn.DBConn):
 
         return 200, "ok", order_id
 
-    def payment(self, user_id: str, password: str, order_id: str) -> Tuple[int, str]:
+    def payment(self, user_id: int, password: str, order_id: int) -> Tuple[int, str]:
         conn = self.conn
         try:
             cursor = conn.execute("SELECT order_id, user_id, store_id FROM new_order WHERE order_id = ?", (order_id,))

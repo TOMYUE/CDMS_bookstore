@@ -14,11 +14,11 @@ class TestAddBook:
         # do before test
         self.seller_id = int(uuid.uuid1())
         self.store_id = int(uuid.uuid1())
-        self.uname = "test_add_book_stock_level1_store_{}".format(str(self.user_id))
-        self.password = self.user_id
+        self.uname = "test_add_book_stock_level1_store_{}".format(str(self.seller_id))
+        self.password = self.seller_id
         self.account = "test_add_book_stock_level1_store"
         self.balance = round(random.uniform(500, 1000), 6)
-        self.seller = register_new_seller(self.user_id, self.store_id, self.password,
+        self.seller = register_new_seller(self.seller_id, self.store_id, self.password,
                                           self.uname, self.account, self.balance)
 
         code = self.seller.create_store(self.store_id)
