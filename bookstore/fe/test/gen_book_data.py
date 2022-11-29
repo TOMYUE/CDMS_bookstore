@@ -1,3 +1,4 @@
+import uuid
 import random
 from fe.access import book
 from fe.access.new_seller import register_new_seller
@@ -5,10 +6,14 @@ from fe.access.new_seller import register_new_seller
 
 class GenBook:
     def __init__(self, user_id, store_id):
-        self.user_id = user_id
+        self.user_id = int(uuid.uuid1())
         self.store_id = store_id
         self.password = self.user_id
-        self.seller = register_new_seller(self.user_id, self.password)
+        self.uname = "test_gen_book"
+        self.account = "test_gen_book"
+        self.balance = 100
+        self.seller = register_new_seller(self.user_id, self.store_id, self.password,
+                                          self.uname, self.account, self.balance)
         code = self.seller.create_store(store_id)
         assert code == 200
         self.__init_book_list__()
