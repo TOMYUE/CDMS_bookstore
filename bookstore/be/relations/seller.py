@@ -62,3 +62,20 @@ def add_book(uid, sid, stock_level, *,
         return 200, f"Success: add a book"
     except Exception as e:
         return 500, f"Failure: {e}"
+
+def add_stock_level(uid, sid, bid, stock_level_delta):
+    try: 
+        with db_session() as session:
+            result = session.query(Store)\
+                .filter(Store.sid==sid and Store.bid==bid and Store.uid==uid)\
+                .update({"inventory_quantity" : Store.inventory_quantity + stock_level_delta})
+            if result == 0:
+                if session.query(Store).filter(Store.sid==sid).count() == 0:
+                    session.commit()
+                    return 501, f"Failure: no such store"
+                else:
+                    return 502, f"Failure: no such book"
+            session.commit()
+        return 200, f"Success: {result}"
+    except Exception as e:
+        return 500, f"Failure: {e}"

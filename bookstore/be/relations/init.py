@@ -234,5 +234,5 @@ def store_id_exist(session, store_id):
         return error_non_exist_store_id(store_id)
 
 
-drop_all_table()
+# drop_all_table()
 create_table()
