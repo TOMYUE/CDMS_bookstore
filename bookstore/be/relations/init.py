@@ -88,6 +88,34 @@ class StoreOwner(Base):
     uid = Column(Integer, ForeignKey(Seller.uid))
 
 
+class Book(Base):
+    """
+    The book relation table
+    """
+
+    # relation name
+    __tablename__ = 'Book'
+
+    #attribute name
+    bid = Column(String, primary_key=True, unique=True, nullable=False)
+    title = Column(String, nullable=False)
+    author = Column(String, nullable=True)  # can have no author
+    publisher = Column(String, nullable=False)
+    original_title = Column(String, nullable=True)  # can have no origin title
+    translator = Column(String, nullable=True)  # can have no translator
+    pub_year = Column(String, nullable=False)
+    pages = Column(Integer, nullable=False)
+    price = Column(Integer, nullable=False)
+    currency_unit = Column(String, nullable=False)
+    binding = Column(String, nullable=False)
+    isbn = Column(String, nullable=False)
+    author_intro = Column(String, nullable=True)  # can have no intro
+    book_intro = Column(String, nullable=True)  # can have no intro
+    content = Column(String, nullable=True)  # can have no content
+    tags = Column(String, nullable=True)  # can have no tag
+    picture = Column(String, nullable=True)  # can have no picture
+
+
 class Store(Base):
     """
     The Order relation object including nineteen attributes.
@@ -106,26 +134,11 @@ class Store(Base):
     __tablename__ = 'Store'
 
     # attributes
-    sid = Column(Integer, ForeignKey(StoreOwner.sid))
+    sid = Column(Integer, ForeignKey(StoreOwner.sid), primary_key=True)
     uid = Column(Integer, ForeignKey(Seller.uid), nullable=False)
-    bid = Column(String, primary_key=True, unique=True, nullable=False)
+    bid = Column(String, ForeignKey(Book.bid))
     inventory_quantity = Column(Integer, nullable=False)
     title = Column(String, nullable=False)
-    author = Column(String, nullable=True)                      # can have no author
-    publisher = Column(String, nullable=False)
-    original_title = Column(String, nullable=True)              # can have no origin title
-    translator = Column(String, nullable=True)                  # can have no translator
-    pub_year = Column(String, nullable=False)
-    pages = Column(Integer, nullable=False)
-    price = Column(Integer, nullable=False)
-    currency_unit = Column(String, nullable=False)
-    binding = Column(String, nullable=False)
-    isbn = Column(String, nullable=False)
-    author_intro = Column(String, nullable=True)                # can have no intro
-    book_intro = Column(String, nullable=True)                  # can have no intro
-    content = Column(String, nullable=True)                     # can have no content
-    tags = Column(String, nullable=True)                        # can have no tag
-    pictures = Column(String, nullable=True)                    # can have no picture
 
 
 class Deal(Base):
@@ -167,7 +180,8 @@ class DealBook(Base):
     # attribute name
     id = Column(Integer, autoincrement=True, primary_key=True, unique=True)
     did = Column(Integer, ForeignKey(Deal.did))
-    bid = Column(String, ForeignKey(Store.bid))
+    sid = Column(Integer, ForeignKey(Store.sid))
+    bid = Column(String, ForeignKey(Book.bid))
     num = Column(Integer, nullable=False)
 
 
@@ -192,6 +206,7 @@ def drop_all_table():
     DROP TABLE IF EXISTS "Buyer" CASCADE ;
     DROP TABLE IF EXISTS "Seller" CASCADE ;
     DROP TABLE IF EXISTS "Store" CASCADE ;
+    DROP TABLE IF EXISTS "Book" CASCADE ;
     DROP TABLE IF EXISTS "Deal" CASCADE ;
     DROP TABLE IF EXISTS "DealBook" CASCADE ;
     DROP TABLE IF EXISTS "StoreOwner" CASCADE ;
@@ -234,5 +249,19 @@ def store_id_exist(session, store_id):
         return error_non_exist_store_id(store_id)
 
 
-# drop_all_table()
+def copy_data_to_book(session):
+    try:
+        with session.begin():
+            sql = """
+               insert into "Book" (bid, title, author, publisher, original_title, translator, pub_year, pages, price, 
+               currency_unit, binding, isbn, author_intro, book_intro, content, tags, picture)select * from "Book_bp"; 
+            """
+            session.execute(sql)
+            session.commit()
+    except Exception as e:
+        print()
+
+
+drop_all_table()
 create_table()
+copy_data_to_book(DBSession())
