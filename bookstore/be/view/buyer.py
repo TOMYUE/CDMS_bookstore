@@ -24,7 +24,7 @@ class Order(BaseModel):
 
 
 @app.post("/new_order")
-def new_order(order: Order):
+async def new_order(order: Order):
     code, msg, order_id = new_order(
         user_id = order.user_id,
         store_id = order.store_id,
@@ -34,7 +34,7 @@ def new_order(order: Order):
 
 
 @app.post("/payment")
-def payment(usr: User, order: Order):
+async def payment(usr: User, order: Order):
     # 用户支付书籍订单的货款，如果账户余额不足，则取消订单
     code, msg = payment(
        usr.uid,
@@ -45,7 +45,7 @@ def payment(usr: User, order: Order):
 
 
 @app.post("/add_funds")
-def add_funds(add_value: int, usr: User):
+async def add_funds(add_value: int, usr: User):
     # 增加个人账户余额
     code, msg = add_funds(
         usr.uid,

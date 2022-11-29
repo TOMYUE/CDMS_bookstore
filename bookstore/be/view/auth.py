@@ -15,7 +15,7 @@ class LoginForm(BaseModel):
     terminal: str
 
 @app.post("/seller/login")
-def seller_login(form: LoginForm):
+async def seller_login(form: LoginForm):
     code, message, token = user.seller_login(
         form.user_id,
         form.password,
@@ -24,7 +24,7 @@ def seller_login(form: LoginForm):
     return JSONResponse({"message": message, "token": token}, status_code=code)
 
 @app.post("/buyer/login")
-def buyer_login(form: LoginForm):
+async def buyer_login(form: LoginForm):
     code, message, token = user.buyer_login(
         form.user_id,
         form.password,
@@ -38,7 +38,7 @@ class LogoutForm(BaseModel):
     token: str
 
 @app.post("/seller/logout")
-def seller_logout(form: LogoutForm):
+async def seller_logout(form: LogoutForm):
     code, message = user.seller_logout(
         form.user_id,
         form.token
@@ -46,7 +46,7 @@ def seller_logout(form: LogoutForm):
     return JSONResponse({"message":message},status_code=code)
 
 @app.post("/buyer/logout")
-def buyer_logout(form: LogoutForm):
+async def buyer_logout(form: LogoutForm):
     code, message = user.buyer_logout(
         form.user_id,
         form.token
@@ -60,7 +60,7 @@ class RegisterForm(BaseModel):
     password: str
 
 @app.post("/seller/register")
-def seller_register(form:RegisterForm):
+async def seller_register(form:RegisterForm):
     code, message = user.seller_register(
         form.user_id,
         form.uname,
@@ -69,7 +69,7 @@ def seller_register(form:RegisterForm):
     return JSONResponse({"message":message}, status_code=code)
 
 @app.post("/buyer/register")
-def buyer_register(form:RegisterForm):
+async def buyer_register(form:RegisterForm):
     code, message = user.buyer_register(
         form.user_id,
         form.uname,
@@ -83,7 +83,7 @@ class UnregisterForm(BaseModel):
     password: str
 
 @app.post("/seller/unregister")
-def seller_unregister(form:UnregisterForm):
+async def seller_unregister(form:UnregisterForm):
     code, message = user.seller_unregister(
         form.user_id,
         form.password
@@ -91,7 +91,7 @@ def seller_unregister(form:UnregisterForm):
     return JSONResponse({"message":message},status_code=code)
 
 @app.post("/buyer/unregister")
-def seller_unregister(form:UnregisterForm):
+async def seller_unregister(form:UnregisterForm):
     code, message = user.buyer_unregister(
         form.user_id,
         form.password
@@ -104,7 +104,7 @@ class ChangePwdForm(BaseModel):
     new_password: str
 
 @app.post("/seller/password")
-def sellse_change_password(form: ChangePwdForm):
+async def sellse_change_password(form: ChangePwdForm):
     code, message = user.seller_change_password(
         form.user_id,
         form.old_password,
@@ -113,7 +113,7 @@ def sellse_change_password(form: ChangePwdForm):
     return JSONResponse({"message":message},status_code=code)
 
 @app.post("/buyer/password")
-def buyer_change_password(form: ChangePwdForm):
+async def buyer_change_password(form: ChangePwdForm):
     code, message = user.buyer_change_password(
         form.user_id,
         form.old_password,

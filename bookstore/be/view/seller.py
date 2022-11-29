@@ -11,7 +11,7 @@ class CreateStoreForm(BaseModel):
     store_id: int
 
 @app.post("/create_store")
-def seller_create_store(form: CreateStoreForm):
+async def seller_create_store(form: CreateStoreForm):
     code, msg = seller.create_store(form.user_id, form.store_id)
     return JSONResponse({"message": msg}, code)
 
@@ -40,10 +40,17 @@ class AddBookForm(BaseModel):
     store_id: int
 
 @app.post("/add_book")
-def seller_add_book(form: AddBookForm):
+async def seller_add_book(form: AddBookForm):
     code, msg = seller.add_book(form.user_id, form.store_id, form.stock_level, **form.book_info.dict())
     return JSONResponse({"message": msg}, code)
 
+class AddStockLevelForm(BaseModel):
+    user_id: int
+    book_id: int
+    store_id: int
+    add_stock_level: int
+
 @app.post("/add_stock_level")
-def add_stock_level():
-    raise "Not implemented yet"
+async def add_stock_level(form: AddStockLevelForm):
+    code, msg = seller.add_stock_level(form.user_id, form.store_id, form.book_id, form.add_stock_level)
+    return JSONResponse({"message": msg}, code)
