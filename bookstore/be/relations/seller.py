@@ -14,7 +14,6 @@ def create_store(uid, sid):
 
 # uid: user_id
 # sid: store_id
-# binfo: book information struct
 def add_book(uid, sid, stock_level, *, 
     tags: List[str] = list(), 
     pictures: List[bytes] = list(),
