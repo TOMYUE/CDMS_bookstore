@@ -14,7 +14,7 @@ deal_status = {
 }
 
 
-def new_order(self, user_id: int, store_id: int, id_and_num: List[Tuple[int, int]]) -> Tuple[int, str, List]:
+def new_order(user_id: int, store_id: int, id_and_num: List[Tuple[int, int]]) -> Tuple[int, str, List]:
     try:
         with db_session() as session:
             # check if user exists
@@ -40,7 +40,7 @@ def new_order(self, user_id: int, store_id: int, id_and_num: List[Tuple[int, int
                 store_book.inventory_quantity -= b_num
                 session.add(store_book)
                 # add new deal to the deal relation
-                deal = Deal(uid=user_id, sid=store_id,
+                deal = Deal(uid=user_id, sid=store_id, bid=bid,
                             order_time=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
                             status=deal_status["下单"], money=store_book.price * b_num)
                 session.add(deal)
@@ -57,7 +57,7 @@ def new_order(self, user_id: int, store_id: int, id_and_num: List[Tuple[int, int
         return 500, f"Failure: {e}", []
 
 
-def payment(self, user_id: int, password: str, store_id: int) -> Tuple[int, str]:
+def payment(user_id: int, password: str, store_id: int) -> Tuple[int, str]:
     # 从deal的表中找出所有这个客户刚刚下单的所有图书的信息，并进行传入值检查，如果发现传入值有误，则进行一些列报错
     # SELECT * FROM deal WHERE uid=user_id and sid=store_id and status=deal_status["下单"]
     # 计算这笔交易的总金额为多少
@@ -108,7 +108,7 @@ def payment(self, user_id: int, password: str, store_id: int) -> Tuple[int, str]
         return 500, f"Failure: {e}"
 
 
-def add_funds(self, user_id, password, add_value) -> Tuple[int, str]:
+def add_funds(user_id, password, add_value) -> Tuple[int, str]:
     # 如果用户不存在直接报错
     # Invalid value check
     if add_value <= 0 or add_value > float('inf'):
@@ -130,3 +130,16 @@ def add_funds(self, user_id, password, add_value) -> Tuple[int, str]:
     except Exception as e:
         return 530, "{}".format(str(e))
 
+
+def receive_book(user_id, sid, did):
+    try:
+        with db_session() as session:
+            filter_condition = (Deal.uid == user_id) and (Deal.sid == sid) and (Deal.did == did) \
+                               and (Deal.status == deal_status["发货"])
+            buyer_deals = session.query(Deal).filter(filter_condition).all()
+            for deal in buyer_deals:
+                deal.status = deal_status["收货"]
+                session.add(deal)
+                session.commit()
+    except Exception as e:
+        return 500,"{}".format(str(e))

@@ -171,7 +171,7 @@ def seller_change_password(uid:int, old_password:str, new_password:str):
                 return code, message
             # self.session.execute("UPDATE Seller SET pwd='%s' WHERE uid='%s'" %(new_password, uid))
             res = session.query(Seller).filter(Seller.uid == uid).update(Seller.pwd)
-            self.session.commit()
+            session.commit()
             return 200, "ok"
     except Exception as e:
         return 500, f"Failure: {e}"
@@ -184,7 +184,7 @@ def buyer_change_password(uid:int, old_password:str, new_password:str):
                 code, message = error.error_authorization_fail()
                 return code, message
             res = session.query(Buyer).filter(Buyer.uid == uid).update(Buyer.pwd)
-            self.session.commit()
+            session.commit()
             return 200, "ok"
     except Exception as e:
         return 500, f"Failure: {e}"

@@ -148,6 +148,7 @@ class Deal(Base):
     oid: the id of the orders
     uid: the id of the buyers
     sid: the id of the stores
+    bid: the book id of the current deal
     order_time: timestamp of the order
     status: status of the order, including four status: __, __, __, __
     money: the total amount of the order
@@ -160,6 +161,7 @@ class Deal(Base):
     did = Column(Integer, autoincrement=True, primary_key=True, unique=True, nullable=True)
     uid = Column(Integer, ForeignKey(Buyer.uid))
     sid = Column(Integer, ForeignKey(StoreOwner.sid))
+    bid = Column(Integer, nullable=False)
     order_time = Column(String, nullable=False)
     status = Column(Integer, nullable=False)
     money = Column(Integer, nullable=False)

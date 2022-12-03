@@ -5,6 +5,7 @@ from fe.access.auth import Auth
 from typing import *
 from typing_extensions import *
 
+
 class Buyer:
     def __init__(self, url_prefix, user_id, password):
         self.url_prefix = urljoin(url_prefix, "buyer/")
@@ -13,10 +14,10 @@ class Buyer:
         self.token = ""
         self.terminal = "my terminal"
         self.auth = Auth(url_prefix)
-        code, self.token = self.auth.login(self.user_id, self.password, self.terminal)
+        code, self.token = self.auth.buyer_login(self.user_id, self.password, self.terminal)
         assert code == 200
 
-    def new_order(self, store_id: str, book_id_and_count: List[Tuple[str, int]]) -> Tuple[int, str]:
+    def new_order(self, store_id: int, book_id_and_count: List[Tuple[int, int]]) -> Tuple[int, str]:
         books = []
         for id_count_pair in book_id_and_count:
             books.append({"id": id_count_pair[0], "count": id_count_pair[1]})
@@ -27,7 +28,7 @@ class Buyer:
         response_json = r.json()
         return r.status_code, response_json.get("order_id")
 
-    def payment(self,  order_id: str):
+    def payment(self,  order_id: int):
         json = {"user_id": self.user_id, "password": self.password, "order_id": order_id}
         url = urljoin(self.url_prefix, "payment")
         headers = {"token": self.token}

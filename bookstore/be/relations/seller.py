@@ -1,4 +1,5 @@
 from be.relations.init import *
+from be.relations.buyer import *
 from typing import *
 
 
@@ -63,6 +64,7 @@ def add_book(uid, sid, stock_level, *,
     except Exception as e:
         return 500, f"Failure: {e}"
 
+
 def add_stock_level(uid, sid, bid, stock_level_delta):
     try: 
         with db_session() as session:
@@ -77,5 +79,19 @@ def add_stock_level(uid, sid, bid, stock_level_delta):
                     return 502, f"Failure: no such book"
             session.commit()
         return 200, f"Success: {result}"
+    except Exception as e:
+        return 500, f"Failure: {e}"
+
+
+def shipping(uid, sid, bid):
+    try:
+        with db_session() as session:
+            filter_condition = (Deal.uid == uid) and (Deal.sid == sid) and (Deal.bid == bid) \
+                               and (Deal.status == deal_status["付款"])
+            buyer_deals = session.query(Deal).filter(filter_condition).all()
+            for deal in buyer_deals:
+                deal.status = deal_status["发货"]
+                session.add(deal)
+                session.commit()
     except Exception as e:
         return 500, f"Failure: {e}"

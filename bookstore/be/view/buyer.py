@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from be.relations import *
+from be.relations import buyer
 from typing import *
 from typing_extensions import *
 from fastapi.responses import JSONResponse
@@ -25,10 +25,10 @@ class Order(BaseModel):
 
 @app.post("/new_order")
 async def new_order(order: Order):
-    code, msg, order_id = new_order(
+    code, msg, order_id = buyer.new_order(
         user_id = order.user_id,
         store_id = order.store_id,
-        id_and_count = order.books
+        id_and_num = order.books
     )
     return JSONResponse({"message": msg, "order_id": order_id}, status_code=code)
 
@@ -36,7 +36,7 @@ async def new_order(order: Order):
 @app.post("/payment")
 async def payment(usr: User, order: Order):
     # 用户支付书籍订单的货款，如果账户余额不足，则取消订单
-    code, msg = payment(
+    code, msg = buyer.payment(
        usr.uid,
        usr.pwd,
        order.store_id
@@ -47,9 +47,18 @@ async def payment(usr: User, order: Order):
 @app.post("/add_funds")
 async def add_funds(add_value: int, usr: User):
     # 增加个人账户余额
-    code, msg = add_funds(
+    code, msg = buyer.add_funds(
         usr.uid,
         usr.pwd,
         add_value
+    )
+    return JSONResponse({"message": msg}, status_code=code)
+
+@app.post("/receive_book")
+async def receive_book(usr: User, deal: Order):
+    code, msg = buyer.receive_book(
+        usr.uid,
+        deal.store_id,
+        deal.deal_id
     )
     return JSONResponse({"message": msg}, status_code=code)

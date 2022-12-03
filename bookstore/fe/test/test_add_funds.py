@@ -5,6 +5,7 @@ from fe.access.new_buyer import register_new_buyer
 
 from typing import *
 
+
 class TestAddFunds:
     @pytest.fixture(autouse=True)
     def pre_run_initialization(self):
@@ -18,9 +19,6 @@ class TestAddFunds:
 
     def test_ok(self):
         code = self.buyer.add_funds(1000)
-        assert code == 200
-
-        code = self.buyer.add_funds(-1000)
         assert code == 200
 
     def test_error_user_id(self):

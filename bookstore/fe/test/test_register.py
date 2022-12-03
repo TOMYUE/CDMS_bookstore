@@ -27,17 +27,17 @@ class TestRegister:
         code = self.auth.register_buyer(self.user_id, self.password, self.uname, self.account, self.balance)
         assert code == 200
 
-        code = self.auth.unregister(self.user_id, self.password)
+        code = self.auth.buyer_unregister(self.user_id, self.password)
         assert code == 200
 
     def test_unregister_error_authorization(self):
         code = self.auth.register_buyer(self.user_id, self.password, self.uname, self.account, self.balance)
         assert code == 200
 
-        code = self.auth.unregister(self.user_id, self.password)
+        code = self.auth.buyer_unregister(self.user_id, self.password)
         assert code != 200
 
-        code = self.auth.unregister(self.user_id, self.password + "_x")
+        code = self.auth.buyer_unregister(self.user_id, self.password + "_x")
         assert code != 200
 
     def test_register_error_exist_user_id(self):

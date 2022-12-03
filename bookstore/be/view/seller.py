@@ -6,14 +6,17 @@ from typing import *
 
 app = FastAPI()
 
+
 class CreateStoreForm(BaseModel):
     user_id: int
     store_id: int
+
 
 @app.post("/create_store")
 async def seller_create_store(form: CreateStoreForm):
     code, msg = seller.create_store(form.user_id, form.store_id)
     return JSONResponse({"message": msg}, code)
+
 
 class BookInfo(BaseModel):
     tags: List[str] = list()
@@ -33,16 +36,19 @@ class BookInfo(BaseModel):
     book_intro: str
     content: str
 
+
 class AddBookForm(BaseModel):
     book_info: BookInfo
     stock_level: int = 0
     user_id: int
     store_id: int
 
+
 @app.post("/add_book")
 async def seller_add_book(form: AddBookForm):
     code, msg = seller.add_book(form.user_id, form.store_id, form.stock_level, **form.book_info.dict())
     return JSONResponse({"message": msg}, code)
+
 
 class AddStockLevelForm(BaseModel):
     user_id: int
@@ -50,7 +56,23 @@ class AddStockLevelForm(BaseModel):
     store_id: int
     add_stock_level: int
 
+
 @app.post("/add_stock_level")
 async def add_stock_level(form: AddStockLevelForm):
     code, msg = seller.add_stock_level(form.user_id, form.store_id, form.book_id, form.add_stock_level)
     return JSONResponse({"message": msg}, code)
+
+
+class ShippingForm(BaseModel):
+    user_id: int
+    seller_id: int
+    book_id: int
+
+
+@app.post("/shipping")
+async def shipping(form: ShippingForm):
+    code, msg = seller.shipping(
+        form.user_id,
+        form.seller_id,
+        form.book_id
+    )
