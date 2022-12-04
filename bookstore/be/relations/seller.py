@@ -90,5 +90,19 @@ def shipping(uid, sid, bid):
                 deal.status = deal_status["发货"]
                 session.add(deal)
                 session.commit()
+        return 200, "Success "
+    except Exception as e:
+        return 500, f"Failure: {e}"
+
+
+def add_book_to_store(uid:int, sid:int, bid:str, quantity:int):
+    try:
+        with db_session() as session:
+            filter_condition = (Store.uid == uid) and (Store.sid == sid) and (Store.bid == bid)
+            store_book = session.query(Store).filter(filter_condition)
+            store_book.inventory_quantity = quantity
+            session.add(store_book)
+            session.commit()
+        return 200, "Success"
     except Exception as e:
         return 500, f"Failure: {e}"

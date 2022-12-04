@@ -14,7 +14,7 @@ deal_status = {
 }
 
 
-def new_order(user_id: int, store_id: int, id_and_num: List[Tuple[int, int]]) -> Tuple[int, str, List]:
+def new_order(user_id: int, store_id: int, id_and_num: List[Tuple[str, int]]) -> Tuple[int, str, List]:
     try:
         with db_session() as session:
             # check if user exists

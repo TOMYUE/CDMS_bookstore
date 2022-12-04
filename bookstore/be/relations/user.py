@@ -97,13 +97,13 @@ def buyer_logout(uid: int, token: str):
         return 500, f"Failure: {e}"
 
 
-def seller_register(uname: str, pwd: str, accout: str, balance: float, token: str, terminal: str):
+def seller_register(uname: str, pwd: str, account: str, balance: float, token: str, terminal: str):
     try:
         with db_session() as session:
             session.add(Seller(uname=uname,
                                pwd=pwd,
-                               account="account",
-                               balance=0,
+                               account=account,
+                               balance=balance,
                                token=token,
                                terminal=terminal))
             session.commit()
@@ -112,19 +112,16 @@ def seller_register(uname: str, pwd: str, accout: str, balance: float, token: st
         return 500, f"Failure: {e}"#, None
 
 
-def buyer_register(uid: int, uname: str, pwd: str):
+def buyer_register(uname: str, pwd: str, account: str, balance: float, token: str, terminal: str):
     terminal = "terminal_{}".format(str(time.time()))
     try:
         with db_session() as session:
-            token = ""
-            session.add(Buyer(uid=uid,
-                              uname=uname,
+            session.add(Buyer(uname=uname,
                               pwd=pwd,
-                              account="account",
-                              balance=0,
+                              account=account,
+                              balance=balance,
                               token=token,
                               terminal=terminal))
-            # session.execute("INSERT INTO Buyer(uid, uname, pwd, account,balance, token, terminal) values(:uid, :pwd, :account, 0, :token, :terminal",{"uid":uid, "uname":uname, "pwd":pwd,"account":"account_name","token":token,"terminal":terminal})
             session.commit()
             return 200, "ok"
     except Exception as e:

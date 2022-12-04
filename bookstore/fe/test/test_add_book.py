@@ -1,7 +1,5 @@
-import time
 import random
 import pytest
-from be.relations.init import db_session, Seller, Store, StoreOwner
 from be.relations.seller import *
 from be.relations.user import seller_register
 import uuid
@@ -41,7 +39,7 @@ class TestAddBook:
                          )
 
     def test_seller_register(self):
-        code, msg= seller_register(self.uname, self.password,
+        code, msg = seller_register(self.uname, self.password,
                                     self.account, self.balance, self.token, self.terminal)
         # self.seller_id = uid
         assert code == 200
@@ -107,7 +105,7 @@ class TestAddBook:
                         content="")
         assert code != 200
 
-    def renew(self):
+    def test_enew(self):
         drop_all_table()
         create_table()
         copy_data_to_book(DBSession())
