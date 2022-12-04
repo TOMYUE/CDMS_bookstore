@@ -20,7 +20,7 @@ def create_store(uid, sid):
 def add_book(uid, sid, stock_level, *, 
     tags: List[str] = list(), 
     pictures: List[bytes] = list(),
-    id: int,
+    id: str,
     title: str,
     author: str,
     publisher: str,
@@ -37,11 +37,8 @@ def add_book(uid, sid, stock_level, *,
 ):
     try:
         with db_session() as session:
-            session.add(Store(
-                sid = sid,
-                uid = uid,
+            session.add(Book(
                 bid = id,
-                inventory_quantity = stock_level,
                 title = title,
                 author = author,
                 publisher = publisher,
@@ -57,7 +54,7 @@ def add_book(uid, sid, stock_level, *,
                 book_intro = book_intro,
                 content = content,
                 tags = ",".join(tags),
-                pictures=",".join(pictures)
+                picture=",".join(pictures)
             ))
             session.commit()
         return 200, f"Success: add a book"

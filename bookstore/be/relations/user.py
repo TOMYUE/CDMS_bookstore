@@ -5,9 +5,10 @@
 from be.relations.init import *
 from typing import *
 from be.model import error
-import  jwt
+import jwt
 import time
 import sqlalchemy
+
 
 def jwt_encode(user_id: str, terminal: str) -> str:
     encoded = jwt.encode(
@@ -17,12 +18,13 @@ def jwt_encode(user_id: str, terminal: str) -> str:
     )
     return encoded.decode("utf-8")
 
+
 def jwt_decode(encoded_token, user_id: str) -> str:
     decoded = jwt.decode(encoded_token, key=user_id, algorithms="HS256")
     return decoded
 
 
-def seller_login(uid:int, pwd:str, terminal:str):
+def seller_login(uid: int, pwd: str, terminal: str):
     try:
         with db_session() as session:
             token = ""
@@ -40,7 +42,8 @@ def seller_login(uid:int, pwd:str, terminal:str):
     except Exception as e:
         return 500, f"Failure: {e}", token
 
-def buyer_login(uid:int, pwd:str, terminal:str):
+
+def buyer_login(uid: int, pwd: str, terminal: str):
     try:
         with db_session() as session:
             token = ""
@@ -57,7 +60,8 @@ def buyer_login(uid:int, pwd:str, terminal:str):
     except Exception as e:
         return 500, f"Failure: {e}", token
 
-def seller_logout(uid:int, token:str):
+
+def seller_logout(uid: int, token: str):
     try:
         with db_session() as session:
             user = session.query(Seller).filter(Seller.uid == uid).first()
@@ -73,6 +77,7 @@ def seller_logout(uid:int, token:str):
             return 200, "ok"
     except Exception as e:
         return 500, f"Failure: {e}"
+
 
 def buyer_logout(uid: int, token: str):
     try:
@@ -91,43 +96,42 @@ def buyer_logout(uid: int, token: str):
     except Exception as e:
         return 500, f"Failure: {e}"
 
-def seller_register(uid:int, uname:str, pwd:str):
-    terminal = "terminal_{}".format(str(time.time()))
-    try:
-        with db_session() as session:
-            token = ""
-            # session.execute("INSERT INTO Seller(uid, uname, pwd, account,balance, token, terminal) values(:uid, :pwd, :account, 0, :token, :terminal",{"uid":uid, "uname":uname, "pwd":pwd,"account":"account_name","token":token,"terminal":terminal})
-            session.add(Seller(uid = uid,
-                               uname = uname,
-                               pwd = pwd,
-                               account = "account",
-                               balance = 0,
-                               token = token,
-                               terminal = terminal))
-            session.commit()
-            return 200, "ok"
-    except Exception as e:
-        return 500, f"Failure: {e}"
 
-def buyer_register(uid:int, uname:str, pwd:str):
-    terminal = "terminal_{}".format(str(time.time()))
+def seller_register(uname: str, pwd: str, accout: str, balance: float, token: str, terminal: str):
     try:
         with db_session() as session:
-            token = ""
-            session.add(Buyer(uid=uid,
-                               uname=uname,
+            session.add(Seller(uname=uname,
                                pwd=pwd,
                                account="account",
                                balance=0,
                                token=token,
                                terminal=terminal))
+            session.commit()
+            return 200, "ok"#, seller.uid
+    except Exception as e:
+        return 500, f"Failure: {e}"#, None
+
+
+def buyer_register(uid: int, uname: str, pwd: str):
+    terminal = "terminal_{}".format(str(time.time()))
+    try:
+        with db_session() as session:
+            token = ""
+            session.add(Buyer(uid=uid,
+                              uname=uname,
+                              pwd=pwd,
+                              account="account",
+                              balance=0,
+                              token=token,
+                              terminal=terminal))
             # session.execute("INSERT INTO Buyer(uid, uname, pwd, account,balance, token, terminal) values(:uid, :pwd, :account, 0, :token, :terminal",{"uid":uid, "uname":uname, "pwd":pwd,"account":"account_name","token":token,"terminal":terminal})
             session.commit()
             return 200, "ok"
     except Exception as e:
         return 500, f"Failure: {e}"
 
-def seller_unregister(uid:int, pwd:str):
+
+def seller_unregister(uid: int, pwd: str):
     try:
         with db_session() as session:
             # user = session.execute("SELECT pwd FROM  Seller WHERE uid=:uid",{"uid": uid}).fetchone()
@@ -145,7 +149,8 @@ def seller_unregister(uid:int, pwd:str):
     except Exception as e:
         return 500, f"Failure: {e}"
 
-def buyer_unregister(uid:int, pwd:str):
+
+def buyer_unregister(uid: int, pwd: str):
     try:
         with db_session() as session:
             user = session.query(Buyer).filter(Buyer.uid == uid).first()
@@ -162,7 +167,8 @@ def buyer_unregister(uid:int, pwd:str):
     except Exception as e:
         return 500, f"Failure: {e}"
 
-def seller_change_password(uid:int, old_password:str, new_password:str):
+
+def seller_change_password(uid: int, old_password: str, new_password: str):
     try:
         with db_session() as session:
             user = session.query(Seller).filter(Seller.uid == uid).first()
@@ -176,7 +182,8 @@ def seller_change_password(uid:int, old_password:str, new_password:str):
     except Exception as e:
         return 500, f"Failure: {e}"
 
-def buyer_change_password(uid:int, old_password:str, new_password:str):
+
+def buyer_change_password(uid: int, old_password: str, new_password: str):
     try:
         with db_session() as session:
             user = session.query(Buyer).filter(Buyer.uid == uid).first()

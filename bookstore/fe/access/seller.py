@@ -4,6 +4,7 @@ from fe.access import book
 from fe.access.auth import Auth
 import json as json_tool
 
+
 class Seller:
     def __init__(self, url_prefix, seller_id: str, password: str):
         self.url_prefix = urljoin(url_prefix, "seller/")

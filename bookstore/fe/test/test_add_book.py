@@ -1,9 +1,9 @@
+import time
 import random
-
 import pytest
-
-from fe.access.new_seller import register_new_seller
-from fe.access import book
+from be.relations.init import db_session, Seller, Store, StoreOwner
+from be.relations.seller import *
+from be.relations.user import seller_register
 import uuid
 from typing import *
 
@@ -12,47 +12,102 @@ class TestAddBook:
     @pytest.fixture(autouse=True)
     def pre_run_initialization(self):
         # do before test
-        self.seller_id = int(uuid.uuid1())
-        self.store_id = int(uuid.uuid1())
-        self.uname = "test_add_book_stock_level1_store_{}".format(str(self.seller_id))
-        self.password = self.seller_id
-        self.account = "test_add_book_stock_level1_store"
+        self.seller = None
+        self.store = None
+        self.seller_id = None
+        self.store_id = random.randint(1, 1000)
+        self.uname = "test_add_book_{}"
+        self.password = str(time.time())
+        self.account = "test_add_book_"
         self.balance = round(random.uniform(500, 1000), 6)
-        self.seller = register_new_seller(self.seller_id, self.store_id, self.password,
-                                          self.uname, self.account, self.balance)
+        self.stock_level = 10
+        self.token = "test_add_book"
+        self.terminal = "terminal_{}".format(str(time.time()))
+        self.book = Book(bid="test_add",
+                         title="test_add",
+                         author="test",
+                         publisher="test",
+                         original_title="",
+                         translator="",
+                         pub_year="1999",
+                         pages=512,
+                         price=1024,
+                         currency_unit="元",
+                         binding="平装",
+                         isbn="978754282382xxx",
+                         author_intro="",
+                         book_intro="",
+                         content=""
+                         )
 
-        code = self.seller.create_store(self.store_id)
+    def test_seller_register(self):
+        code, msg= seller_register(self.uname, self.password,
+                                    self.account, self.balance, self.token, self.terminal)
+        # self.seller_id = uid
         assert code == 200
-        book_db = book.BookDB()
-        self.books = book_db.get_book_info(0, 2) #TODO: related works with SQLORM
+        # assert self.seller_id is not None
 
-        yield
-        # do after test
 
+    # do after test
     def test_ok(self):
-        for b in self.books:
-            code = self.seller.add_book(self.store_id, 0, b)
-            assert code == 200
+        code, msg = add_book(1, self.store_id, self.stock_level,
+                        id="test_add",
+                        title="test_add",
+                        author = "test",
+                        publisher = "test",
+                        original_title = "",
+                        translator = "",
+                        pub_year = "1999",
+                        pages = 512,
+                        price = 1024,
+                        binding = "平装",
+                        isbn = "978754282382xxx",
+                        author_intro = "",
+                        book_intro = "",
+                        content = "")
+        assert code == 200
 
     def test_error_non_exist_store_id(self):
-        for b in self.books:
-            # non exist store id
-            code = self.seller.add_book(self.store_id, 0, b)
-            assert code != 200
-
-    def test_error_exist_book_id(self):
-        for b in self.books:
-            code = self.seller.add_book(self.store_id, 0, b)
-            assert code == 200
-        for b in self.books:
-            # exist book id
-            code = self.seller.add_book(self.store_id, 0, b)
-            assert code != 200
+        code = add_book(self.seller_id, "None exist", self.stock_level,
+                        id="test_add",
+                        title="test_add",
+                        author="test",
+                        publisher="test",
+                        original_title="",
+                        translator="",
+                        pub_year="1999",
+                        pages=512,
+                        price=1024,
+                        binding="平装",
+                        isbn="978754282382xxx",
+                        author_intro="",
+                        book_intro="",
+                        content="")
+        rm_book_sql = '''delete from "Book" where bid='test_add';'''
+        with db_session() as session:
+            session.execute(rm_book_sql)
+            session.commit()
+        assert code != 200
 
     def test_error_non_exist_user_id(self):
-        for b in self.books:
-            # non exist user id
-            self.seller.seller_id = self.seller.seller_id + "_x"
-            code = self.seller.add_book(self.store_id, 0, b)
-            assert code != 200
+        code = add_book("None exist", self.store_id, self.stock_level,
+                        id="test_add",
+                        title="test_add",
+                        author="test",
+                        publisher="test",
+                        original_title="",
+                        translator="",
+                        pub_year="1999",
+                        pages=512,
+                        price=1024,
+                        binding="平装",
+                        isbn="978754282382xxx",
+                        author_intro="",
+                        book_intro="",
+                        content="")
+        assert code != 200
 
+    def renew(self):
+        drop_all_table()
+        create_table()
+        copy_data_to_book(DBSession())
