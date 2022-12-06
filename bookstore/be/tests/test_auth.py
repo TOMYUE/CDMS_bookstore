@@ -7,7 +7,6 @@ sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 class AuthRequest:
     def __init__(self) -> None:
-        print(sys.path)
         from run import app
         self.cli = TestClient(app)
 

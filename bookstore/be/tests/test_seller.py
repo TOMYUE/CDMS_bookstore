@@ -1,6 +1,88 @@
-from fastapi.testclient import TestClient
 from uuid import uuid1
 
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+from tests.test_auth import AuthRequest
+from typing import *
+
+class SellerRequest(AuthRequest):
+    def __init__(self) -> None:
+        super().__init__()
+
+    def create_store(self, expected_code, user_id, store_id):
+        json = {
+            "user_id": user_id,
+            "store_id": store_id,
+        }
+        response = self.cli.post("/seller/create_store", json=json)
+        assert response.status_code == expected_code
+    
+    def add_book(self, 
+        expected_code, *
+        id: int,
+        title: str,
+        author: str,
+        publisher: str, 
+        original_title: str, 
+        translator: str, 
+        pub_year: str, 
+        pages: int, 
+        price: int, 
+        binding: str, 
+        isbn: str, 
+        author_intro: str, 
+        book_intro: str, 
+        content: str, 
+        tags: List[str] = list(),
+        pictures: List[bytes] = list(),
+    ):
+        json = {
+            "id": id,
+            "title": title,
+            "author": author,
+            "publisher": publisher, 
+            "original_title": original_title, 
+            "translator": translator, 
+            "pub_year": pub_year, 
+            "pages": pages, 
+            "price": price, 
+            "binding": binding, 
+            "isbn": isbn, 
+            "author_intro": author_intro, 
+            "book_intro": book_intro, 
+            "content": content, 
+            "tags": tags,
+            "pictures": pictures,
+        }
+        response = self.cli.post("/seller/add_book", json=json)
+        assert response.status_code == expected_code
+    
+    def add_stock_level(self, 
+        expected_code,
+        user_id: int, 
+        book_id: int, 
+        store_id: int, 
+        add_stock_level: int, 
+    ):
+        json = {
+            "user_id": user_id,
+            "book_id": book_id,
+            "store_id": store_id,
+            "add_stock_level": add_stock_level
+        }
+        response = self.cli.post("/seller/add_stock_level", json=json)
+        assert response.status_code == expected_code
+
+
+def test_create_store_ok():
+    seller = SellerRequest()
+    seller_info = seller.seller_register(200)
+    seller.create_store(200, seller_info["uid"], int(uuid1()))
+
+def test_create_store_dup():
+    seller = SellerRequest()
+    seller_info = seller.seller_register(200)
+    store_id = int(uuid1())
+    seller.create_store(200, seller_info["uid"], store_id)
+    seller.create_store(500, seller_info["uid"], store_id)
