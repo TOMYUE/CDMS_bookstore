@@ -107,16 +107,19 @@ def seller_register(uname: str, pwd: str, account: str, balance: float, token: s
         with db_session() as session:
             user = session.query(Seller).filter(Seller.uname == uname).first()
             if user is None:
-                session.add(Seller(uname=uname,
+                seller = Seller(uname=uname,
                                    pwd=pwd,
                                    account=account,
                                    balance=balance,
                                    token=token,
-                                   terminal=terminal))
+                                   terminal=terminal)
+                session.add(seller)
+                session.flush()
+                uid = seller.uid
                 session.commit()
-                return 200, "ok"#, seller.uid
+                return 200, "ok", uid
             else:
-                return 502, "non_exist_user_id"
+                return 502, "non_exist_user_id",-1
     except Exception as e:
         return 500, f"Failure: {e}"#, None
 
@@ -127,16 +130,19 @@ def buyer_register(uname: str, pwd: str, account: str, balance: float, token: st
         with db_session() as session:
             user = session.query(Buyer).filter(Buyer.uname == uname).first()
             if user is None:
-                session.add(Buyer(uname=uname,
-                                  pwd=pwd,
-                                  account=account,
-                                  balance=balance,
-                                  token=token,
-                                  terminal=terminal))
+                buyer = Buyer(uname=uname,
+                      pwd=pwd,
+                      account=account,
+                      balance=balance,
+                      token=token,
+                      terminal=terminal)
+                session.add(buyer)
                 session.commit()
-                return 200, "ok"
+                session.flush()
+                uid = buyer.uid
+                return 200, "ok", uid
             else:
-                return 502, "non_exist_user_id"
+                return 502, "non_exist_user_id", -1
     except Exception as e:
         return 500, f"Failure: {e}"
 
@@ -287,3 +293,44 @@ def search_tag_in_store(tag:str, page:int, sid:int):
                 return 504, f"non_exist_tag{tag}"
     except Exception as e:
         return 500, f"Failure: {e}"
+
+def search_content(book_intro:str, page:int):
+    try:
+        with db_session() as session:
+            pageSize = 10
+            if page > 0:
+                results = session.query(Book).filter(Book.intro.contains(book_intro)).limit(pageSize).offset(pageSize * (page-1))
+            else:
+                results = session.query(Book).filter(Book.book_intro.contains(book_intro))
+            if results is not None:
+                res = []
+                for record in results:
+                    res.insert(record)
+                print(record)
+                return 200, "ok"
+            else:
+                return 505, f"non_exist_such_content{book_intro}"
+    except Exception as e:
+        return 500, f"Failure:{e}"
+
+def search_content_in_store(book_intro:str, page:int, sid:int):
+    try:
+        with db_session() as session:
+            pageSize = 10
+            stores = session.query(Store.sid).filter(Store.sid == sid)
+            if stores is None:
+                return 506,
+            if page > 0:
+                results = session.query(Book,Store).join(Store, Store.bid == Book.bid).filter(Book.intro.contains(book_intro) and Store.sid == sid).limit(pageSize).offset(pageSize * (page - 1))
+            else:
+                results = session.query(Book,Store).join(Store, Store.bid == Book.bid).filter(Book.book_intro.contains(book_intro) and Store.bid == sid)
+            if results is not None:
+                res = []
+                for record in results:
+                    res.insert(record)
+                print(record)
+                return 200, "ok"
+            else:
+                return 505, f"non_exist_such_content{book_intro}"
+    except Exception as e:
+        return 500, f"Failure:{e}"
