@@ -159,8 +159,12 @@ def cancel_deal(uid, did):
     try: 
         with db_session() as session:
             result = session.query(Deal)\
-                .filter(Deal.uid == uid and Deal.did == did)\
-                .update({"status": deal_status["取消"]})
+                .filter(Deal.uid == uid and Deal.did == did)
+            bid = result.one().bid
+            result.update({"status": deal_status["取消"]})
+            session.query(Store)\
+                .filter(Store.bid == bid)\
+                .update({"inventory_quantity": Store.inventory_quantity+1})
             session.commit()
         return 200, f'{result}'
     except Exception as e:
