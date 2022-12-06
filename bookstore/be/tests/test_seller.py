@@ -30,6 +30,11 @@ class SellerRequest(AuthRequest):
     def __init__(self) -> None:
         super().__init__()
 
+    def create_rand_store(self, expected_code, user_id):
+        store_id = int(uuid1()) % 1000
+        self.create_store(expected_code, user_id, store_id)
+        return {"sid": store_id}
+
     def create_store(self, expected_code, user_id, store_id):
         json = {
             "user_id": user_id,
@@ -37,7 +42,7 @@ class SellerRequest(AuthRequest):
         }
         response = self.cli.post("/seller/create_store", json=json)
         assert response.status_code == expected_code, response.content
-    
+
     def add_book(self, 
         expected_code, *,
         id: int,
