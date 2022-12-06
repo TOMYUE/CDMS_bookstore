@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from be.relations import buyer
+from relations import buyer
 from typing import *
 from typing_extensions import *
 from fastapi.responses import JSONResponse

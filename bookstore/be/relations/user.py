@@ -2,9 +2,9 @@
 # @Time : 2022/11/23 19:54
 # @File : user.py
 
-from be.relations.init import *
+from relations.init import *
 from typing import *
-from be.model import error
+from model import error
 import jwt
 import time
 import sqlalchemy

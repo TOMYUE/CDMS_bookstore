@@ -1,5 +1,5 @@
-from be.relations.init import *
-from be.relations.buyer import *
+from relations.init import *
+from relations.buyer import *
 from typing import *
 
 

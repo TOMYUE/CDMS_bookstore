@@ -3,7 +3,7 @@ from sqlalchemy import create_engine, MetaData, Table, inspect
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-from be.model.error import *
+from model.error import *
 
 # SQLALCHEMY_DATABASE_URL = "postgresql://postgres:123456@localhost:5432/tangyue"
 SQLALCHEMY_DATABASE_URL = "postgresql://stu10205501461:" \

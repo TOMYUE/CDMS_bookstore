@@ -1,11 +1,11 @@
 from fastapi import FastAPI
 from fastapi.requests import *
 from fastapi.responses import JSONResponse
-from be.model import user
+from model import user
 from pydantic import BaseModel
 import sqlalchemy
 from typing import *
-from be.relations import user
+from relations import user
 
 app = FastAPI()
 

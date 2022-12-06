@@ -1,16 +1,14 @@
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-from be.relations import seller
+from relations import seller
 from typing import *
 
 app = FastAPI()
 
-
 class CreateStoreForm(BaseModel):
     user_id: int
     store_id: int
-
 
 @app.post("/create_store")
 async def seller_create_store(form: CreateStoreForm):
@@ -51,12 +49,10 @@ async def add_stock_level(form: AddStockLevelForm):
     code, msg = seller.add_stock_level(form.user_id, form.store_id, form.book_id, form.add_stock_level)
     return JSONResponse({"message": msg}, code)
 
-
 class ShippingForm(BaseModel):
     user_id: int
     seller_id: int
     book_id: int
-
 
 @app.post("/shipping")
 async def shipping(form: ShippingForm):

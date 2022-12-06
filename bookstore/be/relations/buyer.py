@@ -1,6 +1,6 @@
 import time
 
-from be.relations.init import *
+from relations.init import *
 from typing import *
 
 
