@@ -14,7 +14,6 @@ deal_status = {
     "取消": 4,
 }
 
-
 def new_order(user_id: int, store_id: int, id_and_num: List[Tuple[str, int]]) -> Tuple[int, str, List]:
     try:
         with db_session() as session:
@@ -159,10 +158,10 @@ def query_deal_hist(uid):
 def cancel_deal(uid, did):
     try: 
         with db_session() as session:
-            deal: Deal = session.query(Deal).filter(Deal.uid == uid and Deal.did == did).one()
-            deal.status = deal_status["取消"]
-            session.add(deal)
+            result = session.query(Deal)\
+                .filter(Deal.uid == uid and Deal.did == did)\
+                .update({"status": deal_status["取消"]})
             session.commit()
-        return 200, deal.did
+        return 200, f'{result}'
     except Exception as e:
         return 500, f'{e}'
