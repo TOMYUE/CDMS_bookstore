@@ -5,7 +5,7 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
-class SellerRequest:
+class AuthRequest:
     def __init__(self) -> None:
         print(sys.path)
         from run import app
@@ -37,22 +37,6 @@ class SellerRequest:
         assert response.status_code == expected_code
         return json
 
-    # def seller_login_ok(self,expected_code=200) -> dict:
-    #     self.init()
-    #     response = self.cli.post("/auth/seller/login")
-    #     assert response.status_code == expected_code
-    #     return ""
-
-    # def seller_change_pwd_ok(self, expected_code=200) -> dict:
-    #     json = {
-    #         "uanme":str(uuid1()),
-    #         "old_pwd": str(uuid1()),
-    #         "new_pwd": str(uuid1())
-    #     }
-    #     response = self.cli.post("/auth/seller/password", json=json)
-    #     assert response.status_code == expected_code
-    #     return json
-
     def seller_login(self, uname, password, terminal,expected_code=200) -> dict:
         json = {
             "uname":uname,
@@ -75,22 +59,16 @@ class SellerRequest:
 
 # ************************************* write test_* functions here, utilize these tools ************************************* #
 
-def test_seller_register_200():
-    SellerRequest().seller_register(200)
+def test_seller_register_ok():
+    AuthRequest().seller_register(200)
 
-def test_buyer_register_200():
-    SellerRequest().buyer_register(200)
+def test_buyer_register_ok():
+    AuthRequest().buyer_register(200)
 
 def test_seller_login_ok():
-    data = SellerRequest().seller_register(200)
-    SellerRequest().seller_login(data["uname"], data["password"],data["terminal"],200)
-
+    data = AuthRequest().seller_register(200)
+    AuthRequest().seller_login(data["uname"], data["password"],data["terminal"],200)
 
 def test_buyer_login_ok():
-    data = SellerRequest().buyer_register(200)
-    SellerRequest().buyer_login(data["uname"], data["password"],data["terminal"],200)
-
-
-# def test_seller_change_pwd_ok():
-#
-#     SellerRequest.seller_change_pwd_ok(200)
+    data = AuthRequest().buyer_register(200)
+    AuthRequest().buyer_login(data["uname"], data["password"],data["terminal"],200)
