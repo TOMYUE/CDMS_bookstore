@@ -247,7 +247,7 @@ def store_id_exist(session, store_id):
             session.commit()
         return exists
     except Exception as e:
-        return error_non_exist_store_id(store_id)
+        return 502, f"error_non_exist_store_id{store_id}"
 
 
 def copy_data_to_book(session):

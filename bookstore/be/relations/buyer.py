@@ -21,22 +21,22 @@ def new_order(user_id: int, store_id: int, id_and_num: List[Tuple[str, int]]) ->
             # check if user exists
             buyer = session.query(Buyer).filter(Buyer.uid == user_id).first()
             if buyer is None:
-                return error_non_exist_user_id(user_id)
+                return 501, f"error_non_exist_user_id{user_id}"
             # check if store exists
             store = session.query(StoreOwner).filger(StoreOwner.sid == store_id).first()
             if store is None:
-                return error_non_exist_store_id(store_id)
+                return 502, f"error_non_exist_store_id{store_id}"
             # add each into the deal
             for bid, b_num in id_and_num:
                 if b_num <= 0:
                     continue
                 store_book = session.query(Store).filter((Store.sid == store_id) and (Store.bid == bid)).first()
                 if store_book is None:
-                    return error_no_book_sell_in_store(store_id)
+                    return 503, f"book not in store {store_id}"
                 elif store_book.inventory_quantity < b_num:
                     # TODO: there is a problem if in all books that he buy, there's only one that have no enough num,
                     #  simply return is very much unnecessary
-                    return error_stock_level_low(bid)
+                    return 503, f"book not in store {bid}"
                 # update inventory_quantity
                 store_book.inventory_quantity -= b_num
                 session.add(store_book)
@@ -74,26 +74,26 @@ def payment(user_id: int, password: str, store_id: int) -> Tuple[int, str]:
             filter_condition = (Deal.uid == user_id) and (Deal.sid == store_id) and (Deal.status == deal_status["下单"])
             buyer_deals = session.query(Deal).filter(filter_condition).all()
             if buyer_deals is None:
-                return error_user_no_deal_exist(user_id)
+                return 502, f"error_user_no_deal_exist {user_id}"
             total_price = 0
             for deal in buyer_deals:
                 total_price += deal.money
             # get user balance
             buyer = session.query(Buyer).filter(Buyer.uid == user_id).first()
             if buyer is None:
-                return error_non_exist_user_id(user_id)
+                return 501, f"error_non_exist_user_id{user_id}"
             if buyer.balance < total_price:
-                return error_not_sufficient_funds(store_id)
+                return 503, f"error_money_not_enough{user_id}"
             # buyer's balance is enough to buy all the book, uddate buyer balance
             buyer.balance -= total_price
             session.add(buyer)
             # get seller
             seller_id = session.query(StoreOwner.uid).filter(StoreOwner.sid == store_id).first().uid
             if seller_id is None:
-                return error_non_exist_store_id(store_id)
+                return 502, f"error_non_existent_store_id{store_id}"
             seller = session.query(Seller).filter(Seller.uid == seller_id).first()
             if seller is None:
-                return error_non_exist_user_id(seller_id)
+                return 504, f"error_non_existent_user_id{seller_id}"
             seller.balance += total_price
             session.add(seller)
 
@@ -113,16 +113,16 @@ def add_funds(user_id, password, add_value) -> Tuple[int, str]:
     # 如果用户不存在直接报错
     # Invalid value check
     if add_value <= 0 or add_value > float('inf'):
-        return error_invalid_add_value(user_id)
+        return 502, f"value cannot be added"
     try:
         with db_session() as session:
             buyer = session.query(Buyer).filter(Buyer.uid == user_id).first()
             # check user exists
             if buyer is None:
-                return error_non_exist_user_id(user_id)
+                return 501, f"error_non_exist_user_id{user_id}"
             # check is pwd matches
             if buyer.pwd != password:
-                return error_authorization_fail()
+                return 504, f"authorization_fail"
             # user id exists and pwd matches, then update the balance for the user
             buyer.balance += add_value
             session.add(buyer)
