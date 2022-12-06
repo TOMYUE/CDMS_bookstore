@@ -17,7 +17,7 @@ async def seller_create_store(form: CreateStoreForm):
 
 class AddBookForm(BaseModel):
     tags: List[str] = list()
-    pictures: List[bytes] = list()
+    pictures: List[str] = list()
     id: int
     title: str
     author: str

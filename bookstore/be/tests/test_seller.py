@@ -6,6 +6,26 @@ sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from tests.test_auth import AuthRequest
 from typing import *
 
+def rand_book():
+    return {
+        "id": int(uuid1()) % 1000,
+        "title": str(uuid1()),
+        "author": str(uuid1()),
+        "publisher": str(uuid1()), 
+        "original_title": str(uuid1()), 
+        "translator": str(uuid1()), 
+        "pub_year": str(uuid1()), 
+        "pages": int(uuid1()) % 1000, 
+        "price": int(uuid1()) % 1000, 
+        "binding": str(uuid1()), 
+        "isbn": str(uuid1()), 
+        "author_intro": str(uuid1()), 
+        "book_intro": str(uuid1()), 
+        "content": str(uuid1()), 
+        "tags": [str(uuid1()) for i in range(20)],
+        "pictures": [str(uuid1()) for i in range(20)],
+    }
+
 class SellerRequest(AuthRequest):
     def __init__(self) -> None:
         super().__init__()
@@ -16,7 +36,7 @@ class SellerRequest(AuthRequest):
             "store_id": store_id,
         }
         response = self.cli.post("/seller/create_store", json=json)
-        assert response.status_code == expected_code
+        assert response.status_code == expected_code, response.content
     
     def add_book(self, 
         expected_code, *,
@@ -35,7 +55,7 @@ class SellerRequest(AuthRequest):
         book_intro: str, 
         content: str, 
         tags: List[str] = list(),
-        pictures: List[bytes] = list(),
+        pictures: List[str] = list(),
     ):
         json = {
             "id": id,
@@ -56,8 +76,13 @@ class SellerRequest(AuthRequest):
             "pictures": pictures,
         }
         response = self.cli.post("/seller/add_book", json=json)
-        assert response.status_code == expected_code
-    
+        assert response.status_code == expected_code, response.content
+
+    def add_rand_book(self, expected_code):
+        book = rand_book()
+        self.add_book(expected_code, **book)
+        return book    
+
     def add_stock_level(self, 
         expected_code,
         user_id: int, 
@@ -72,69 +97,32 @@ class SellerRequest(AuthRequest):
             "add_stock_level": add_stock_level
         }
         response = self.cli.post("/seller/add_stock_level", json=json)
-        assert response.status_code == expected_code
+        assert response.status_code == expected_code, response.content
 
 # ************************************* write test_* functions here, utilize these tools ************************************* #
 
 def test_create_store_ok():
     seller = SellerRequest()
     seller_info = seller.seller_register(200)
-    seller.create_store(200, seller_info["uid"], int(uuid1()))
+    store_id = int(uuid1()) % 1000
+    seller.create_store(200, seller_info["uid"], store_id)
 
 def test_create_store_dup():
     seller = SellerRequest()
     seller_info = seller.seller_register(200)
-    store_id = int(uuid1())
+    store_id = int(uuid1()) % 1000
     seller.create_store(200, seller_info["uid"], store_id)
     seller.create_store(500, seller_info["uid"], store_id)
 
 def test_add_book():
-    def rand_book():
-        return {
-            "id": int(uuid1()),
-            "title": str(uuid1()),
-            "author": str(uuid1()),
-            "publisher": str(uuid1()), 
-            "original_title": str(uuid1()), 
-            "translator": str(uuid1()), 
-            "pub_year": str(uuid1()), 
-            "pages": int(uuid1()), 
-            "price": int(uuid1()), 
-            "binding": str(uuid1()), 
-            "isbn": str(uuid1()), 
-            "author_intro": str(uuid1()), 
-            "book_intro": str(uuid1()), 
-            "content": str(uuid1()), 
-            "tags": str(uuid1()),
-            "pictures": str(uuid1()),
-        }
     seller = SellerRequest()
     seller.add_book(200, **rand_book())
 
 def test_add_stock_level():
-    def rand_book():
-        return {
-            "id": int(uuid1()),
-            "title": str(uuid1()),
-            "author": str(uuid1()),
-            "publisher": str(uuid1()), 
-            "original_title": str(uuid1()), 
-            "translator": str(uuid1()), 
-            "pub_year": str(uuid1()), 
-            "pages": int(uuid1()), 
-            "price": int(uuid1()), 
-            "binding": str(uuid1()), 
-            "isbn": str(uuid1()), 
-            "author_intro": str(uuid1()), 
-            "book_intro": str(uuid1()), 
-            "content": str(uuid1()), 
-            "tags": str(uuid1()),
-            "pictures": str(uuid1()),
-        }
     seller = SellerRequest()
     book = rand_book()
     seller.add_book(200, **book)
     seller_info = seller.seller_register()
-    store_id = int(uuid1())
+    store_id = int(uuid1()) % 1000
     seller.create_store(200, seller_info["uid"], store_id)
     seller.add_stock_level(200, seller_info["uid"], book_id=book["id"], store_id=store_id, add_stock_level=5)

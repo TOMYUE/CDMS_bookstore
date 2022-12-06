@@ -73,7 +73,7 @@ def add_stock_level(uid, sid, bid, stock_level_delta):
             result = session.query(Store)\
                 .filter(Store.sid==sid and Store.uid==uid and Store.bid==bid)
             if result.count: 
-                result.update(Store.inventory_quantity==Store.inventory_quantity+stock_level_delta)
+                result.update({"inventory_quantity": Store.inventory_quantity+stock_level_delta})
             else:
                 result = session.add(Store(sid=sid, bid=bid, uid=uid, inventory_quanity=stock_level_delta))
             session.commit()
