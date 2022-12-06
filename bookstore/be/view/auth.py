@@ -148,3 +148,63 @@ class searchtitleLocalForm(BaseModel):
 async def search_title_in_store(form:searchtitleLocalForm):
     code, msg = user.search_title_in_store(form.title, form.page, form.sid)
     return JSONResponse({"message": msg}, status_code=code)
+
+class searchtagGlobForm(BaseModel):
+    tag: str
+    page: int
+
+@app.post("/search_tag")
+async def search_tag(form:searchtagGlobForm):
+    code, msg = user.search_tag(form.tag, form.page)
+    return JSONResponse({"message":msg},status_code=code)
+
+
+class searchtagLocalForm(BaseModel):
+    tag: str
+    page: int
+
+
+@app.post("/search_tag_in_store")
+async def search_tag_in_store(form: searchtagLocalForm):
+    code, msg = user.search_tag_in_store(form.tag, form.page, form.sid)
+    return JSONResponse({"message": msg}, status_code=code)
+
+
+class searchcontentGlobForm(BaseModel):
+    book_intro: str
+    page: int
+
+@app.post("/search_content")
+async def search_content(form:searchcontentGlobForm):
+    code, msg = user.search_content(form.book_intro, form.page)
+    return JSONResponse({"message":msg},status_code=code)
+
+class searchcontentLocalForm(BaseModel):
+    book_intro: str
+    page: int
+    sid: int
+
+@app.post("/search_content_in_store")
+async def search_content_in_store(form:searchcontentLocalForm):
+    code, msg = user.search_content_in_store(form.book_intro, form.page, form.sid)
+    return JSONResponse({"message":msg},status_code=code)
+
+class searchauthorGlobForm(BaseModel):
+    author: str
+    page: int
+
+@app.post("/search_author")
+async def search_author(form: searchauthorGlobForm):
+    code, msg = user.search_author(form.author, form.page)
+    return JSONResponse({"message":msg},status_code=code)
+
+
+class searchauthorLocalForm(BaseModel):
+    author: str
+    page: int
+    sid: int
+
+@app.post("/search_author_in_store")
+async def search_author(form: searchauthorLocalForm):
+    code, msg = user.search_author_in_store(form.author, form.page, form.sid)
+    return JSONResponse({"message":msg},status_code=code)

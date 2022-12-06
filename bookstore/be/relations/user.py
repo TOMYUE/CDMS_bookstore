@@ -75,7 +75,7 @@ def seller_logout(uname: str, token: str):
             #     return 502, f"non_exist_user_id{uname}"
             if user.token != token:
                 return 501, "authorization failed"
-            newtoken = "token"
+            newtoken = token
             # session.execute("UPDATE Seller SET token='%s' WHERE uid='%s'" %(newtoken, uid))
             user = session.query(Seller).filter(Seller.uname == uname).update({"token": newtoken})
             session.commit()
