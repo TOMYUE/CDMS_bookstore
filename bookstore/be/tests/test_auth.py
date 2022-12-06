@@ -50,6 +50,19 @@ class AuthRequest:
             "password": password
         }
 
+    def buyer_login(self, uname, password, terminal,expected_code=200) -> dict:
+        json = {
+            "uname":uname,
+            "password": password,
+            "terminal": terminal
+        }
+        response = self.cli.post("/auth/buyer/login",json=json)
+        assert response.status_code == expected_code
+        return {
+            "uname": uname,
+            "password": password
+        }
+
     def logout(self):
         raise Exception("TODO")
 
