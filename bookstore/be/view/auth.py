@@ -9,14 +9,14 @@ from relations import user
 app = FastAPI()
 
 class LoginForm(BaseModel):
-    user_id: int
+    uname: str
     password: str
     terminal: str
 
 @app.post("/seller/login")
 async def seller_login(form: LoginForm):
     code, message, token = user.seller_login(
-        form.user_id,
+        form.uname,
         form.password,
         form.terminal
     )
@@ -25,7 +25,7 @@ async def seller_login(form: LoginForm):
 @app.post("/buyer/login")
 async def buyer_login(form: LoginForm):
     code, message, token = user.buyer_login(
-        form.user_id,
+        form.uname,
         form.password,
         form.terminal
     )
@@ -33,13 +33,13 @@ async def buyer_login(form: LoginForm):
 
 
 class LogoutForm(BaseModel):
-    user_id: int
+    uname: str
     token: str
 
 @app.post("/seller/logout")
 async def seller_logout(form: LogoutForm):
     code, message = user.seller_logout(
-        form.user_id,
+        form.uname,
         form.token
     )
     return JSONResponse({"message":message},status_code=code)
@@ -47,44 +47,53 @@ async def seller_logout(form: LogoutForm):
 @app.post("/buyer/logout")
 async def buyer_logout(form: LogoutForm):
     code, message = user.buyer_logout(
-        form.user_id,
+        form.uname,
         form.token
     )
     return JSONResponse({"message":message},status_code=code)
 
 
 class RegisterForm(BaseModel):
-    user_id: int
     uname: str
     password: str
+    account: str
+    balance: float
+    token: str
+    terminal: str
 
 @app.post("/seller/register")
 async def seller_register(form:RegisterForm):
     code, message = user.seller_register(
-        form.user_id,
         form.uname,
-        form.password
+        form.password,
+        form.account,
+        form.balance,
+        form.token,
+        form.terminal
     )
     return JSONResponse({"message":message}, status_code=code)
 
 @app.post("/buyer/register")
 async def buyer_register(form:RegisterForm):
     code, message = user.buyer_register(
-        form.user_id,
         form.uname,
-        form.password
+        form.password,
+        form.account,
+        form.balance,
+        form.token,
+        form.terminal
     )
     return JSONResponse({"message":message}, status_code=code)
 
 
 class UnregisterForm(BaseModel):
-    user_id: int
+    uname: str
     password: str
 
 @app.post("/seller/unregister")
 async def seller_unregister(form:UnregisterForm):
     code, message = user.seller_unregister(
-        form.user_id,
+        form.uname,
         form.password
     )
     return JSONResponse({"message":message},status_code=code)
@@ -92,20 +101,20 @@ async def seller_unregister(form:UnregisterForm):
 @app.post("/buyer/unregister")
 async def seller_unregister(form:UnregisterForm):
     code, message = user.buyer_unregister(
-        form.user_id,
+        form.uname,
         form.password
     )
     return JSONResponse({"message":message},status_code=code)
 
 class ChangePwdForm(BaseModel):
-    user_id: int
+    uname: str
     old_password: str
     new_password: str
 
 @app.post("/seller/password")
 async def sellse_change_password(form: ChangePwdForm):
     code, message = user.seller_change_password(
-        form.user_id,
+        form.uname,
         form.old_password,
         form.new_password
     )
@@ -114,8 +123,28 @@ async def sellse_change_password(form: ChangePwdForm):
 @app.post("/buyer/password")
 async def buyer_change_password(form: ChangePwdForm):
     code, message = user.buyer_change_password(
-        form.user_id,
+        form.uname,
         form.old_password,
         form.new_password
     )
     return JSONResponse({"message":message},status_code=code)
+
+
+class searchtitleGlobForm(BaseModel):
+    title: str
+    page: int
+
+@app.post("/search_title")
+async def search_title(form:searchtitleGlobForm):
+    code, msg = user.search_title(form.title, form.page)
+    return JSONResponse({"message": msg}, status_code=code)
+
+class searchtitleLocalForm(BaseModel):
+    title:str
+    page:int
+    sid:int
+
+@app.post("/search_title_in_store")
+async def search_title_in_store(form:searchtitleLocalForm):
+    code, msg = user.search_title_in_store(form.title, form.page, form.sid)
+    return JSONResponse({"message": msg}, status_code=code)

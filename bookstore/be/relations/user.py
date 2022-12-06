@@ -107,8 +107,7 @@ def seller_register(uname: str, pwd: str, account: str, balance: float, token: s
         with db_session() as session:
             user = session.query(Seller).filter(Seller.uname == uname).first()
             if user is None:
-                session.add(Seller(uid=int(time.time()),
-                                    uname=uname,
+                session.add(Seller(uname=uname,
                                    pwd=pwd,
                                    account=account,
                                    balance=balance,
@@ -210,5 +209,81 @@ def buyer_change_password(uname: str, old_password: str, new_password: str):
             res = session.query(Buyer).filter(Buyer.uname == uname).update({"pwd":new_password})
             session.commit()
             return 200, "ok"
+    except Exception as e:
+        return 500, f"Failure: {e}"
+
+
+#这个是全局搜索，page是用户想看的第几页搜索结果
+#默认前端传入的参数page是从1开始数的
+#如果传入的page为0，就不分页
+def search_title(title:str, page:int):
+    try:
+        with db_session() as session:
+            pageSize = 10
+            if page > 0:
+                results = session.query(Book).filter(Book.title == title).order_by(Book.price.asc()).limit(pageSize).offset(pageSize * (page-1))
+            else:
+                results = session.query(Book).filter(Book.title == title).order_by(Book.price.asc())
+            if results is not None:
+                return 200, "ok"
+            else:
+                return 503, f"non_exist_book_id{title}"
+    except Exception as e:
+        return 500, f"Failure: {e}"
+
+
+def search_title_in_store(title:str, page:int, sid:int):
+    try:
+        with db_session() as session:
+            pageSize = 10
+            if page > 0:
+                results = session.query(Book, Store).join(Store,Store.bid == Book.bid).\
+                        filter(Book.title == title and Store.sid == sid).order_by(Book.price.asc()).limit(pageSize).offset(pageSize * (page-1))
+            else:
+                results = session.query(Book, Store).join(Store, Store.bid == Book.bid). \
+                    filter(Book.title == title and Store.sid == sid).order_by(Book.price.asc())
+            if results is not None:
+                return 200, "ok"
+            else:
+                return 503, f"non_exist_book_id{title}"
+    except Exception as e:
+        return 500, f"Failure: {e}"
+
+def search_tag(tag:str, page:int):
+    try:
+        with db_session() as session:
+            pageSize = 10
+            if page > 0:
+                results = session.query(Book).filter(Book.tag.contains(tag)).order_by(Book.price).limit(pageSize).offset(pageSize * (page-1))
+            else:
+                results = session.query(Book).filter(Book.tag.contains(tag)).order_by(Book.price)
+            if results is not None:
+                res = []
+                for record in results:
+                    res.insert(record)
+                print(res)
+                return 200,"ok"
+            else:
+                return 504, f"non_exist_tag{tag}"
+    except Exception as e:
+        return 500, f"Failure: {e}"
+
+
+def search_tag_in_store(tag:str, page:int, sid:int):
+    try:
+        with db_session() as session:
+            pageSize = 10
+            if page > 0:
+                results = session.query(Book,Store).join(Store, Store.bid == Book.bid).filter(Book.tag.contains(tag) and Store.sid == sid).order_by(Book.price).limit(pageSize).offset(pageSize * (page-1))
+            else:
+                results = session.query(Book,Store).join(Store, Store.bid == Book.bid).filter(Book.tag.contains(tag)and Store.sid == sid).order_by(Book.price)
+            if results is not None:
+                res = []
+                for record in results:
+                    res.insert(record)
+                print(res)
+                return 200,"ok"
+            else:
+                return 504, f"non_exist_tag{tag}"
     except Exception as e:
         return 500, f"Failure: {e}"
