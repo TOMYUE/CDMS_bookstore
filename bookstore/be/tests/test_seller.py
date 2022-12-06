@@ -19,7 +19,7 @@ class SellerRequest(AuthRequest):
         assert response.status_code == expected_code
     
     def add_book(self, 
-        expected_code, *
+        expected_code, *,
         id: int,
         title: str,
         author: str,
@@ -74,6 +74,7 @@ class SellerRequest(AuthRequest):
         response = self.cli.post("/seller/add_stock_level", json=json)
         assert response.status_code == expected_code
 
+# ************************************* write test_* functions here, utilize these tools ************************************* #
 
 def test_create_store_ok():
     seller = SellerRequest()
@@ -86,3 +87,54 @@ def test_create_store_dup():
     store_id = int(uuid1())
     seller.create_store(200, seller_info["uid"], store_id)
     seller.create_store(500, seller_info["uid"], store_id)
+
+def test_add_book():
+    def rand_book():
+        return {
+            "id": int(uuid1()),
+            "title": str(uuid1()),
+            "author": str(uuid1()),
+            "publisher": str(uuid1()), 
+            "original_title": str(uuid1()), 
+            "translator": str(uuid1()), 
+            "pub_year": str(uuid1()), 
+            "pages": int(uuid1()), 
+            "price": int(uuid1()), 
+            "binding": str(uuid1()), 
+            "isbn": str(uuid1()), 
+            "author_intro": str(uuid1()), 
+            "book_intro": str(uuid1()), 
+            "content": str(uuid1()), 
+            "tags": str(uuid1()),
+            "pictures": str(uuid1()),
+        }
+    seller = SellerRequest()
+    seller.add_book(200, **rand_book())
+
+def test_add_stock_level():
+    def rand_book():
+        return {
+            "id": int(uuid1()),
+            "title": str(uuid1()),
+            "author": str(uuid1()),
+            "publisher": str(uuid1()), 
+            "original_title": str(uuid1()), 
+            "translator": str(uuid1()), 
+            "pub_year": str(uuid1()), 
+            "pages": int(uuid1()), 
+            "price": int(uuid1()), 
+            "binding": str(uuid1()), 
+            "isbn": str(uuid1()), 
+            "author_intro": str(uuid1()), 
+            "book_intro": str(uuid1()), 
+            "content": str(uuid1()), 
+            "tags": str(uuid1()),
+            "pictures": str(uuid1()),
+        }
+    seller = SellerRequest()
+    book = rand_book()
+    seller.add_book(200, **book)
+    seller_info = seller.seller_register()
+    store_id = int(uuid1())
+    seller.create_store(200, seller_info["uid"], store_id)
+    seller.add_stock_level(200, seller_info["uid"], book_id=book["id"], store_id=store_id, add_stock_level=5)

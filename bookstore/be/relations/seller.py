@@ -65,20 +65,21 @@ def add_book(*,
 def add_stock_level(uid, sid, bid, stock_level_delta):
     try: 
         with db_session() as session:
+            ownership = session.query(StoreOwner)\
+                .filter(StoreOwner.sid==sid and StoreOwner.uid==uid).count
+            if ownership == 0:
+                session.commit() 
+                raise Exception("user doesn't own this store")
             result = session.query(Store)\
-                .filter(Store.sid==sid and Store.bid==bid and Store.uid==uid)\
-                .update({"inventory_quantity" : Store.inventory_quantity + stock_level_delta})
-            if result == 0:
-                if session.query(Store).filter(Store.sid==sid).count() == 0:
-                    session.commit()
-                    return 501, f"Failure: no such store"
-                else:
-                    return 502, f"Failure: no such book"
+                .filter(Store.sid==sid and Store.uid==uid and Store.bid==bid)
+            if result.count: 
+                result.update(Store.inventory_quantity==Store.inventory_quantity+stock_level_delta)
+            else:
+                result = session.add(Store(sid=sid, bid=bid, uid=uid, inventory_quanity=stock_level_delta))
             session.commit()
         return 200, f"Success: {result}"
     except Exception as e:
         return 500, f"Failure: {e}"
-
 
 def shipping(uid, sid, bid):
     try:
