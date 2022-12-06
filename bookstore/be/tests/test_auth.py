@@ -22,6 +22,8 @@ class AuthRequest:
         }
         response = self.cli.post("/auth/seller/register", json=json)
         assert response.status_code == expected_code
+        res = response.json()
+        json.update({"uid": res['uid']})
         return json
 
     def buyer_register(self, expected_code=200) -> dict:
@@ -35,6 +37,8 @@ class AuthRequest:
         }
         response = self.cli.post("/auth/buyer/register", json=json)
         assert response.status_code == expected_code
+        res = response.json()
+        json.update({"uid": res['uid']})
         return json
 
     def seller_login(self, uname, password, terminal,expected_code=200) -> dict:

@@ -63,7 +63,7 @@ class RegisterForm(BaseModel):
 
 @app.post("/seller/register")
 async def seller_register(form:RegisterForm):
-    code, message = user.seller_register(
+    code, message, uid = user.seller_register(
         form.uname,
         form.password,
         form.account,
@@ -71,11 +71,11 @@ async def seller_register(form:RegisterForm):
         form.token,
         form.terminal
     )
-    return JSONResponse({"message":message}, status_code=code)
+    return JSONResponse({"message":message,"uid":uid}, status_code=code)
 
 @app.post("/buyer/register")
 async def buyer_register(form:RegisterForm):
-    code, message = user.buyer_register(
+    code, message, uid = user.buyer_register(
         form.uname,
         form.password,
         form.account,
@@ -83,7 +83,7 @@ async def buyer_register(form:RegisterForm):
         form.token,
         form.terminal
     )
-    return JSONResponse({"message":message}, status_code=code)
+    return JSONResponse({"message":message, "uid":uid}, status_code=code)
 
 
 class UnregisterForm(BaseModel):
