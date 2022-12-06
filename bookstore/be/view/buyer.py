@@ -62,3 +62,13 @@ async def receive_book(usr: User, deal: Order):
         deal.deal_id
     )
     return JSONResponse({"message": msg}, status_code=code)
+
+@app.get("/history")
+async def history(usr: User):
+    code, msg = buyer.query_deal_hist(usr.uid)
+    return JSONResponse({"message": msg}, status_code=code)
+
+@app.post("/cancel_deal")
+async def cancel_deal(usr: User, deal: Order):
+    code, msg = buyer.cancel_deal(usr.uid, deal.deal_id)
+    return JSONResponse({"message": msg}, status_code=code)

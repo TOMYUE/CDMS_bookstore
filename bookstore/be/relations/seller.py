@@ -17,7 +17,7 @@ def create_store(uid, sid):
 
 # uid: user_id
 # sid: store_id
-def add_book(uid, sid, stock_level, *, 
+def add_book(*, 
     tags: List[str] = list(), 
     pictures: List[bytes] = list(),
     id: str,
@@ -83,13 +83,17 @@ def add_stock_level(uid, sid, bid, stock_level_delta):
 def shipping(uid, sid, bid):
     try:
         with db_session() as session:
-            filter_condition = (Deal.uid == uid) and (Deal.sid == sid) and (Deal.bid == bid) \
-                               and (Deal.status == deal_status["付款"])
+            filter_condition = (
+                Deal.uid == uid and 
+                Deal.sid == sid and 
+                Deal.bid == bid and 
+                Deal.status == deal_status["付款"]
+            )
             buyer_deals = session.query(Deal).filter(filter_condition).all()
             for deal in buyer_deals:
                 deal.status = deal_status["发货"]
                 session.add(deal)
-                session.commit()
+            session.commit()
         return 200, "Success "
     except Exception as e:
         return 500, f"Failure: {e}"

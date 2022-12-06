@@ -10,7 +10,8 @@ deal_status = {
     "下单": 0,
     "付款": 1,
     "发货": 2,
-    "收货": 3
+    "收货": 3,
+    "取消": 4,
 }
 
 
@@ -143,3 +144,25 @@ def receive_book(user_id, sid, did):
                 session.commit()
     except Exception as e:
         return 500,"{}".format(str(e))
+
+# input: user id 
+def query_deal_hist(uid):
+    try: 
+        with db_session() as session:
+            deal_list = session.query(Deal).filter(Deal.uid == uid).all()
+            session.commit()
+        return 200, deal_list
+    except Exception as e:
+        return 500, f'{e}'
+
+# input: user id, deal id
+def cancel_deal(uid, did):
+    try: 
+        with db_session() as session:
+            deal: Deal = session.query(Deal).filter(Deal.uid == uid and Deal.did == did).one()
+            deal.status = deal_status["取消"]
+            session.add(deal)
+            session.commit()
+        return 200, deal.did
+    except Exception as e:
+        return 500, f'{e}'
