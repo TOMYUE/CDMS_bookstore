@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 from fastapi.requests import *
 from fastapi.responses import JSONResponse
-from model import user
 from pydantic import BaseModel
 import sqlalchemy
 from typing import *
