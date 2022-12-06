@@ -30,13 +30,13 @@ class SellerRequest:
             "password": password
         }
 
-    def logout(self, ):
+    def logout(self):
         raise Exception("TODO")
 
-    def change_pwd():
+    def change_pwd(self):
         raise Exception("TODO")
 
-# ************************************* write tests here, utilize seller request ************************************* #
+# ************************************* write test_* functions here, utilize these tools ************************************* #
 
 def test_login_200():
     SellerRequest().register(200)
