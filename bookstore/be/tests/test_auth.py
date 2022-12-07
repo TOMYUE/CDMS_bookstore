@@ -126,115 +126,139 @@ class AuthRequest:
 # ************************************* write test_* functions here, utilize these tools ************************************* #
 
 def test_seller_register_ok():
-    AuthRequest().seller_register(200)
+    auth = AuthRequest()
+    auth.seller_register(200)
 
 def test_buyer_register_ok():
-    AuthRequest().buyer_register(200)
+    auth = AuthRequest()
+    auth.buyer_register(200)
 
 def test_seller_login_ok():
-    data = AuthRequest().seller_register(200)
-    AuthRequest().seller_login(data["uname"], data["password"],data["terminal"],200)
+    auth = AuthRequest()
+    data = auth.seller_register(200)
+    auth.seller_login(data["uname"], data["password"],data["terminal"],200)
 
 #input wrong password
 def test_seller_login_error1():
-    data = AuthRequest().seller_register(200)
-    AuthRequest().seller_login(data["uname"], "password", data["terminal"],501)
+    auth = AuthRequest()
+    data = auth.seller_register(200)
+    auth.seller_login(data["uname"], "password", data["terminal"],501)
 
 #user not exists
 def test_seller_login_error2():
-    data = AuthRequest().seller_register(200)
-    AuthRequest().seller_login("nobody", "password", data["terminal"],502)
+    auth = AuthRequest()
+    data = auth.seller_register(200)
+    auth.seller_login("nobody", "password", data["terminal"],502)
 
 
 def test_buyer_login_ok():
-    data = AuthRequest().buyer_register(200)
-    AuthRequest().buyer_login(data["uname"], data["password"],data["terminal"],200)
+    auth = AuthRequest()
+    data = auth.buyer_register(200)
+    auth.buyer_login(data["uname"], data["password"],data["terminal"],200)
 
 #input wrong password
 def test_buyer_login_error1():
-    data = AuthRequest().buyer_register(200)
-    AuthRequest().buyer_login(data["uname"], "password", data["terminal"],501)
+    auth = AuthRequest()
+    data = auth.buyer_register(200)
+    auth.buyer_login(data["uname"], "password", data["terminal"],501)
 
 #user not exists
 def test_buyer_login_error2():
-    data = AuthRequest().buyer_register(200)
-    AuthRequest().buyer_login("nobody", "password", data["terminal"],502)
+    auth = AuthRequest()
+    data = auth.buyer_register(200)
+    auth.buyer_login("nobody", "password", data["terminal"],502)
 
 
 # def test_seller_logout_ok():
 def test_seller_logout_ok():
-    data = AuthRequest().seller_register(200)
-    AuthRequest().seller_logout(data['uname'], data['token'],200)
+    auth = AuthRequest()
+    data = auth.seller_register(200)
+    auth.seller_logout(data['uname'], data['token'],200)
 
 #wrong token
 def test_seller_logout_error():
-    data = AuthRequest().seller_register(200)
-    AuthRequest().seller_logout(data['uname'], "faketoken",501)
+    auth = AuthRequest()
+    data = auth.seller_register(200)
+    auth.seller_logout(data['uname'], "faketoken",501)
 
 # def test_seller_logout_ok():
 def test_buyer_logout_ok():
-    data = AuthRequest().buyer_register(200)
-    AuthRequest().buyer_logout(data['uname'], data['token'], 200)
+    auth = AuthRequest()
+    data = auth.buyer_register(200)
+    auth.buyer_logout(data['uname'], data['token'], 200)
 
 # wrong token
 def test_buyer_logout_error():
-    data = AuthRequest().buyer_register(200)
-    AuthRequest().buyer_logout(data['uname'], "faketoken", 501)
+    auth = AuthRequest()
+    data = auth.buyer_register(200)
+    auth.buyer_logout(data['uname'], "faketoken", 501)
 
 def test_seller_unregister_ok():
-    data = AuthRequest().seller_register(200)
-    AuthRequest().seller_ungister(data['uname'],data['password'],200)
+    auth = AuthRequest()
+    data = auth.seller_register(200)
+    auth.seller_ungister(data['uname'],data['password'],200)
 
 #input wrong password
 def test_seller_unregister_error1():
-    data = AuthRequest().seller_register(200)
-    AuthRequest().seller_ungister(data['uname'],"fakepassword",501)
+    auth = AuthRequest()
+    data = auth.seller_register(200)
+    auth.seller_ungister(data['uname'],"fakepassword",501)
 
 #user none exists
 def test_seller_unregister_error2():
-    data = AuthRequest().seller_register(200)
-    AuthRequest().seller_ungister("nobody","fakepassword",502)
+    auth = AuthRequest()
+    data = auth.seller_register(200)
+    auth.seller_ungister("nobody","fakepassword",502)
 
 def test_buyer_unregister_ok():
-    data = AuthRequest().buyer_register(200)
-    AuthRequest().buyer_ungister(data['uname'], data['password'], 200)
+    auth = AuthRequest()
+    data = auth.buyer_register(200)
+    auth.buyer_ungister(data['uname'], data['password'], 200)
 
 # input wrong password
 def test_buyer_unregister_error1():
-    data = AuthRequest().buyer_register(200)
-    AuthRequest().buyer_ungister(data['uname'], "fakepassword", 501)
+    auth = AuthRequest()
+    data = auth.buyer_register(200)
+    auth.buyer_ungister(data['uname'], "fakepassword", 501)
 
 # user none exists
 def test_buyer_unregister_error2():
-    data = AuthRequest().buyer_register(200)
-    AuthRequest().buyer_ungister("nobody", "fakepassword", 502)
+    auth = AuthRequest()
+    data = auth.buyer_register(200)
+    auth.buyer_ungister("nobody", "fakepassword", 502)
 
 def test_seller_change_pwd_ok():
-    data = AuthRequest().seller_register(200)
-    AuthRequest().seller_change_pwd(data['uname'],data['password'],data['password'],200)
+    auth = AuthRequest()
+    data = auth.seller_register(200)
+    auth.seller_change_pwd(data['uname'],data['password'],data['password'],200)
 
 #input wrong password
 def test_seller_change_pwd_error1():
-    data = AuthRequest().seller_register(200)
-    AuthRequest().seller_change_pwd(data['uname'],"fakepassword",data['password'],501)
+    auth = AuthRequest()
+    data = auth.seller_register(200)
+    auth.seller_change_pwd(data['uname'],"fakepassword",data['password'],501)
 
 #user none exists
 def test_seller_change_pwd_error2():
-    data = AuthRequest().seller_register(200)
-    AuthRequest().seller_change_pwd("nobody",data['password'],data['password'],502)
+    auth = AuthRequest()
+    data = auth.seller_register(200)
+    auth.seller_change_pwd("nobody",data['password'],data['password'],502)
 
 
 def test_buyer_change_pwd_ok():
-    data = AuthRequest().buyer_register(200)
-    AuthRequest().buyer_change_pwd(data['uname'],data['password'],data['password'],200)
+    auth = AuthRequest()
+    data = auth.buyer_register(200)
+    auth.buyer_change_pwd(data['uname'],data['password'],data['password'],200)
 
 #input wrong password
 def test_buyer_change_pwd_error1():
-    data = AuthRequest().buyer_register(200)
-    AuthRequest().buyer_change_pwd(data['uname'],"fakepassword",data['password'],501)
+    auth = AuthRequest()
+    data = auth.buyer_register(200)
+    auth.buyer_change_pwd(data['uname'],"fakepassword",data['password'],501)
 
 #user none exists
 def test_buyer_change_pwd_error2():
-    data = AuthRequest().buyer_register(200)
-    AuthRequest().buyer_change_pwd("nobody",data['password'],data['password'],502)
+    auth = AuthRequest()
+    data = auth.buyer_register(200)
+    auth.buyer_change_pwd("nobody",data['password'],data['password'],502)
 
