@@ -117,7 +117,7 @@ class SellerRequest(AuthRequest):
         }
         response = self.cli.post("/seller/query_stock_level", json=json)
         assert response.status_code == expected_code, response.content
-        return response.content
+        return response.json()
 
 # ************************************* write test_* functions here, utilize these tools ************************************* #
 
@@ -146,4 +146,4 @@ def test_add_stock_level():
     store_id = int(uuid1()) % 1000
     seller.create_store(200, seller_info["uid"], store_id)
     seller.add_stock_level(200, seller_info["uid"], book_id=str(book["id"]), store_id=store_id, add_stock_level=5)
-    # raise Exception(seller.query_stock_level(200, seller_info["uid"], book_id=book["id"], store_id=store_id))
+    assert seller.query_stock_level(200, seller_info["uid"], book_id=book["id"], store_id=store_id)["message"] == 5
