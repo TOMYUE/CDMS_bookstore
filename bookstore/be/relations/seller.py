@@ -71,13 +71,24 @@ def add_stock_level(uid, sid, bid, stock_level_delta):
                 session.commit() 
                 raise Exception("user doesn't own this store")
             result = session.query(Store)\
-                .filter(Store.sid==sid and Store.uid==uid and Store.bid==bid)
-            if result.count: 
-                result.update({"inventory_quantity": Store.inventory_quantity+stock_level_delta})
-            else:
-                result = session.add(Store(sid=sid, bid=bid, uid=uid, inventory_quanity=stock_level_delta))
+                .filter(Store.sid==sid)\
+                .filter(Store.uid==uid)\
+                .filter(Store.bid==bid)\
+                .update({"inventory_quantity": Store.inventory_quantity+stock_level_delta})
+            if result == 0:
+                result = session.add(Store(sid=sid, bid=bid, uid=uid, inventory_quantity=stock_level_delta))
             session.commit()
         return 200, f"Success: {result}"
+    except Exception as e:
+        return 500, f"Failure: {e}"
+
+def query_stock_level(_, sid, bid):
+    try: 
+        with db_session() as session:
+            result = session.query(Store.inventory_quantity)\
+                .filter(Store.sid==sid and Store.bid==bid).one_or_none()
+            session.commit()
+        return 200, 0 if result is None else result["inventory_quantity"]
     except Exception as e:
         return 500, f"Failure: {e}"
 

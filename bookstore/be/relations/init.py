@@ -133,11 +133,12 @@ class Store(Base):
     __tablename__ = 'Store'
 
     # attributes
+    # rid = Column(Integer, autoincrement=True, primary_key=True, unique=True, nullable=False)
     sid = Column(Integer, ForeignKey(StoreOwner.sid), primary_key=True)
-    uid = Column(Integer, ForeignKey(Seller.uid), nullable=False)
-    bid = Column(String, ForeignKey(Book.bid), nullable=True)
+    uid = Column(Integer, ForeignKey(Seller.uid))
+    bid = Column(String, ForeignKey(Book.bid), primary_key=True)
     inventory_quantity = Column(Integer, nullable=False)
-    # title = Column(String, nullable=False)
+
 
 
 class Deal(Base):
@@ -181,7 +182,7 @@ class DealBook(Base):
     # attribute name
     id = Column(Integer, autoincrement=True, primary_key=True, unique=True)
     did = Column(Integer, ForeignKey(Deal.did))
-    sid = Column(Integer, ForeignKey(Store.sid))
+    sid = Column(Integer, ForeignKey(StoreOwner.sid))
     bid = Column(String, ForeignKey(Book.bid))
     num = Column(Integer, nullable=False)
 
@@ -262,7 +263,10 @@ def copy_data_to_book(session):
     except Exception as e:
         print()
 
+def init():
+    drop_all_table()
+    create_table()
+    copy_data_to_book(DBSession())
 
-drop_all_table()
-create_table()
-copy_data_to_book(DBSession())
+if __name__ == '__main__':
+    init()

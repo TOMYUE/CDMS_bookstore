@@ -8,7 +8,7 @@ from typing import *
 
 def rand_book():
     return {
-        "id": int(uuid1()) % 1000,
+        "id": str(uuid1()),
         "title": str(uuid1()),
         "author": str(uuid1()),
         "publisher": str(uuid1()), 
@@ -45,7 +45,7 @@ class SellerRequest(AuthRequest):
 
     def add_book(self, 
         expected_code, *,
-        id: int,
+        id: str,
         title: str,
         author: str,
         publisher: str, 
@@ -91,7 +91,7 @@ class SellerRequest(AuthRequest):
     def add_stock_level(self, 
         expected_code,
         user_id: int, 
-        book_id: int, 
+        book_id: str, 
         store_id: int, 
         add_stock_level: int, 
     ):
@@ -103,6 +103,21 @@ class SellerRequest(AuthRequest):
         }
         response = self.cli.post("/seller/add_stock_level", json=json)
         assert response.status_code == expected_code, response.content
+
+    def query_stock_level(self, 
+        expected_code, 
+        user_id: int,
+        book_id: str,
+        store_id: int
+    ):
+        json = {
+            "user_id": user_id,
+            "book_id": book_id,
+            "store_id": store_id
+        }
+        response = self.cli.post("/seller/query_stock_level", json=json)
+        assert response.status_code == expected_code, response.content
+        return response.content
 
 # ************************************* write test_* functions here, utilize these tools ************************************* #
 
@@ -130,4 +145,5 @@ def test_add_stock_level():
     seller_info = seller.seller_register()
     store_id = int(uuid1()) % 1000
     seller.create_store(200, seller_info["uid"], store_id)
-    seller.add_stock_level(200, seller_info["uid"], book_id=book["id"], store_id=store_id, add_stock_level=5)
+    seller.add_stock_level(200, seller_info["uid"], book_id=str(book["id"]), store_id=store_id, add_stock_level=5)
+    # raise Exception(seller.query_stock_level(200, seller_info["uid"], book_id=book["id"], store_id=store_id))

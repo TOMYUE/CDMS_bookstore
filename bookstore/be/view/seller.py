@@ -18,7 +18,7 @@ async def seller_create_store(form: CreateStoreForm):
 class AddBookForm(BaseModel):
     tags: List[str] = list()
     pictures: List[str] = list()
-    id: int
+    id: str
     title: str
     author: str
     publisher: str
@@ -40,7 +40,7 @@ async def seller_add_book(form: AddBookForm):
 
 class AddStockLevelForm(BaseModel):
     user_id: int
-    book_id: int
+    book_id: str
     store_id: int
     add_stock_level: int
 
@@ -49,10 +49,20 @@ async def add_stock_level(form: AddStockLevelForm):
     code, msg = seller.add_stock_level(form.user_id, form.store_id, form.book_id, form.add_stock_level)
     return JSONResponse({"message": msg}, code)
 
+class QueryStockLevelForm(BaseModel):
+    user_id: int
+    book_id: str
+    store_id: int
+
+@app.post("/query_stock_level")
+async def query_stock_level(form: QueryStockLevelForm):
+    code, msg = seller.query_stock_level(form.user_id, form.store_id, form.book_id)
+    return JSONResponse({"message": msg}, code)
+
 class ShippingForm(BaseModel):
     user_id: int
     seller_id: int
-    book_id: int
+    book_id: str
 
 @app.post("/shipping")
 async def shipping(form: ShippingForm):

@@ -8,7 +8,7 @@ sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 class AuthRequest:
     def __init__(self) -> None:
         from run import app
-        self.cli = TestClient(app)
+        self.cli = TestClient(app())
 
     def seller_register(self, expected_code=200) -> dict:
         json = {
