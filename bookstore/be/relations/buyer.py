@@ -20,22 +20,22 @@ def new_order(user_id: int, store_id: int, id_and_num: List[Tuple[str, int]]) ->
             # check if user exists
             buyer = session.query(Buyer).filter(Buyer.uid == user_id).first()
             if buyer is None:
-                return 501, f"error_non_exist_user_id{user_id}"
+                return 501, f"error_non_exist_user_id{user_id}", []
             # check if store exists
             store = session.query(StoreOwner).filger(StoreOwner.sid == store_id).first()
             if store is None:
-                return 502, f"error_non_exist_store_id{store_id}"
+                return 502, f"error_non_exist_store_id{store_id}", []
             # add each into the deal
             for bid, b_num in id_and_num:
                 if b_num <= 0:
                     continue
                 store_book = session.query(Store).filter((Store.sid == store_id) and (Store.bid == bid)).first()
                 if store_book is None:
-                    return 503, f"book not in store {store_id}"
+                    return 503, f"book not in store {store_id}", []
                 elif store_book.inventory_quantity < b_num:
                     # TODO: there is a problem if in all books that he buy, there's only one that have no enough num,
                     #  simply return is very much unnecessary
-                    return 503, f"book not in store {bid}"
+                    return 503, f"book not in store {bid}", []
                 # update inventory_quantity
                 store_book.inventory_quantity -= b_num
                 session.add(store_book)
@@ -57,7 +57,7 @@ def new_order(user_id: int, store_id: int, id_and_num: List[Tuple[str, int]]) ->
         return 500, f"Failure: {e}", []
 
 
-def payment(user_id: int, password: str, store_id: int) -> Tuple[int, str]:
+def payment(user_id: int, store_id: int) -> Tuple[int, str]:
     # 从deal的表中找出所有这个客户刚刚下单的所有图书的信息，并进行传入值检查，如果发现传入值有误，则进行一些列报错
     # SELECT * FROM deal WHERE uid=user_id and sid=store_id and status=deal_status["下单"]
     # 计算这笔交易的总金额为多少
@@ -108,7 +108,7 @@ def payment(user_id: int, password: str, store_id: int) -> Tuple[int, str]:
         return 500, f"Failure: {e}"
 
 
-def add_funds(user_id, password, add_value) -> Tuple[int, str]:
+def add_funds(user_id, add_value) -> Tuple[int, str]:
     # 如果用户不存在直接报错
     # Invalid value check
     if add_value <= 0 or add_value > float('inf'):
@@ -120,8 +120,8 @@ def add_funds(user_id, password, add_value) -> Tuple[int, str]:
             if buyer is None:
                 return 501, f"error_non_exist_user_id{user_id}"
             # check is pwd matches
-            if buyer.pwd != password:
-                return 504, f"authorization_fail"
+            # if buyer.pwd != password:
+            #     return 504, f"authorization_fail"
             # user id exists and pwd matches, then update the balance for the user
             buyer.balance += add_value
             session.add(buyer)
