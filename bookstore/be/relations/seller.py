@@ -86,9 +86,11 @@ def query_stock_level(_, sid, bid):
     try: 
         with db_session() as session:
             result = session.query(Store.inventory_quantity)\
-                .filter(Store.sid==sid and Store.bid==bid).one_or_none()
+                .filter(Store.sid==sid)\
+                .filter(Store.bid==bid)\
+                .one_or_none()
             session.commit()
-        return 200, 0 if result is None else result["inventory_quantity"]
+        return 200, result["inventory_quantity"]
     except Exception as e:
         return 500, f"Failure: {e}"
 
