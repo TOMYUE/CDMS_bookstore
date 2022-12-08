@@ -226,7 +226,7 @@ def buyer_id_exist(session, buyer_id):
             session.commit()
         return exists
     except Exception as e:
-        return 500, f"error_non_exits_user_id{buyer_id}"
+        return 511, f"error_non_exist_user_id{buyer_id}"
 
 
 def book_id_exist(session, book_id):
@@ -237,7 +237,8 @@ def book_id_exist(session, book_id):
             session.commit()
         return exists
     except Exception as e:
-        return 501, f"error_non_exist_book_id{book_id}"
+        return 510, f"none_exist_bookid_{book_id}"
+
 
 def store_id_exist(session, store_id):
     """if store id exists return true, else return false"""
