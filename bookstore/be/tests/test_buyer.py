@@ -118,59 +118,51 @@ def test_add_funds():
     auth = AuthRequest()
     buyer = BuyerRequest()
     buyer_info = auth.buyer_register(200)
-    buyer.add_funds(200, buyer_info['uid'], 100)
+    print("xxxxxxxxxxxxxxxx")
+    print(buyer_info['uid'])
+    print("xxxxxxxxxxxxxxxx")
+    buyer.add_funds(200, 101, buyer_info['uid'])
 
 
 def test_receive_book():
     auth = AuthRequest()
-    # buyer register
     buyer = BuyerRequest()
-    buyer_info = auth.buyer_register(200)
-    # seller register
     seller = SellerRequest()
+    book_id = '1000167'
+    add_stock_level = 5
+    buyer_info = auth.buyer_register(200)
     seller_info = auth.seller_register(200)
     store_id = int(uuid1()) % 1000
-    book_id = '1000167'
-    add_stock_level = 10
     seller.create_store(200, seller_info["uid"], store_id)
     seller.add_stock_level(200, seller_info["uid"], book_id, store_id, add_stock_level)
-    # buyer buy a book, get a deal id
-    new_order_json = buyer.new_order(200, buyer_info['uid'], store_id, book_id, add_stock_level)
-    deal_id = new_order_json['deal_id']
-    buyer.receive_book(200, buyer_info['uid'], store_id, deal_id)
+    buyer.new_order(200, buyer_info['uid'], store_id, book_id, 1)
+    buyer.receive_book(200, buyer_info['uid'], store_id, 1)
 
-def test_history():
-    auth = AuthRequest()
-    # buyer register
-    buyer = BuyerRequest()
-    buyer_info = auth.buyer_register(200)
-    # seller register
-    seller = SellerRequest()
-    seller_info = auth.seller_register(200)
-    store_id = int(uuid1()) % 1000
-    book_id = '1000167'
-    add_stock_level = 10
-    seller.create_store(200, seller_info["uid"], store_id)
-    seller.add_stock_level(200, seller_info["uid"], book_id, store_id, add_stock_level)
-    # buyer buy a book, get a deal id
-    buyer.new_order(200, buyer_info['uid'], store_id, book_id, add_stock_level)
-    buyer.history(200, buyer_info['uid'])
+# def test_history():
+#     auth = AuthRequest()
+#     buyer = BuyerRequest()
+#     seller = SellerRequest()
+#     book_id = '1000167'
+#     add_stock_level = 5
+#     buyer_info = auth.buyer_register(200)
+#     seller_info = auth.seller_register(200)
+#     store_id = int(uuid1()) % 1000
+#     seller.create_store(200, seller_info["uid"], store_id)
+#     seller.add_stock_level(200, seller_info["uid"], book_id, store_id, add_stock_level)
+#     buyer.new_order(200, buyer_info['uid'], store_id, book_id, 1)
+#     buyer.history(200, buyer_info['uid'])
 
 
 def test_cancel_deal():
     auth = AuthRequest()
-    # buyer register
     buyer = BuyerRequest()
-    buyer_info = auth.buyer_register(200)
-    # seller register
     seller = SellerRequest()
+    book_id = '1000167'
+    add_stock_level = 5
+    buyer_info = auth.buyer_register(200)
     seller_info = auth.seller_register(200)
     store_id = int(uuid1()) % 1000
-    book_id = '1000167'
-    add_stock_level = 10
     seller.create_store(200, seller_info["uid"], store_id)
     seller.add_stock_level(200, seller_info["uid"], book_id, store_id, add_stock_level)
-    # buyer buy a book, get a deal id
-    new_order_json = buyer.new_order(200, buyer_info['uid'], store_id, book_id, add_stock_level)
-    deal_id = new_order_json['deal_id']
-    buyer.cancel_deal(buyer_info['uid'], deal_id)
+    buyer.new_order(200, buyer_info['uid'], store_id, book_id, 1)
+    buyer.cancel_deal(200, buyer_info['uid'], 1)

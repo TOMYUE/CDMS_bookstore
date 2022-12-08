@@ -76,7 +76,7 @@ class HistoryForm(BaseModel):
 
 @app.get("/history")
 async def history(form: HistoryForm):
-    code, msg = buyer.query_deal_hist(form.user_id)
+    code, msg = buyer.history(form.user_id)
     return JSONResponse({"message": msg}, status_code=code)
 
 
@@ -86,6 +86,6 @@ class Cancel_deal_form(BaseModel):
 
 
 @app.post("/cancel_deal")
-async def cancel_deal(form: ReceiveBookForm):
+async def cancel_deal(form: Cancel_deal_form):
     code, msg = buyer.cancel_deal(form.user_id, form.deal_id)
     return JSONResponse({"message": msg}, status_code=code)

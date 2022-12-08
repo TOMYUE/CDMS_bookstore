@@ -56,16 +56,6 @@ def new_order(user_id: int, store_id: int, id_and_num: List[Tuple[str, int]]) ->
 
 
 def payment(user_id: int, store_id: int) -> Tuple[int, str]:
-    # 从deal的表中找出所有这个客户刚刚下单的所有图书的信息，并进行传入值检查，如果发现传入值有误，则进行一些列报错
-    # SELECT * FROM deal WHERE uid=user_id and sid=store_id and status=deal_status["下单"]
-    # 计算这笔交易的总金额为多少
-    # 获取用户的账户金额信息，select balance from Buyer where uid=user_id
-    # 如果账户金额小于图书总金额，报错，调用error函数
-    # 如果账户金额足够支付，则
-    # ——1. 扣款,更新账户信息 update Buyer set balance = new_balance
-    # ——2. 商家的账户进账 update Seller set balance = new_balance
-    # ——3. 所有图书的交易记录的状态进行更改 update Deal set status=deal_status["付款"]
-    # ——4. 结束commit
     try:
         with db_session() as session:
             filter_condition = (Deal.uid == user_id) and (Deal.sid == store_id) and (Deal.status == deal_status["下单"])
@@ -113,14 +103,10 @@ def add_funds(user_id, add_value) -> Tuple[int, str]:
         return 502, f"value cannot be added"
     try:
         with db_session() as session:
+            print(user_id)
             buyer = session.query(Buyer).filter(Buyer.uid == user_id).first()
-            # check user exists
             if buyer is None:
                 return 501, f"error_non_exist_user_id{user_id}"
-            # check is pwd matches
-            # if buyer.pwd != password:
-            #     return 504, f"authorization_fail"
-            # user id exists and pwd matches, then update the balance for the user
             buyer.balance += add_value
             session.add(buyer)
             session.commit()
@@ -139,11 +125,13 @@ def receive_book(user_id, sid, did):
                 deal.status = deal_status["收货"]
                 session.add(deal)
                 session.commit()
+            return 200, "success"
     except Exception as e:
         return 500,"{}".format(str(e))
 
+
 # input: user id 
-def query_deal_hist(uid):
+def history(uid):
     try: 
         with db_session() as session:
             deal_list = session.query(Deal).filter(Deal.uid == uid).all()
@@ -152,18 +140,17 @@ def query_deal_hist(uid):
     except Exception as e:
         return 500, f'{e}'
 
+
 # input: user id, deal id
 def cancel_deal(uid, did):
-    try: 
+    try:
         with db_session() as session:
-            result = session.query(Deal)\
-                .filter(Deal.uid == uid and Deal.did == did)
-            bid = result.one().bid
-            result.update({"status": deal_status["取消"]})
-            session.query(Store)\
-                .filter(Store.bid == bid)\
-                .update({"inventory_quantity": Store.inventory_quantity+1})
-            session.commit()
-        return 200, f'{result}'
+            filter_condition = (Deal.uid == uid) and (Deal.did == did)
+            buyer_deals = session.query(Deal).filter(filter_condition).all()
+            for deal in buyer_deals:
+                deal.status = deal_status["取消"]
+                session.add(deal)
+                session.commit()
+            return 200, "success"
     except Exception as e:
         return 500, f'{e}'
