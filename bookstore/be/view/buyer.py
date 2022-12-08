@@ -8,27 +8,18 @@ from pydantic import BaseModel
 app = FastAPI()
 
 
-class User(BaseModel):
-    uid: int
-    uname: str
-    pwd: str
-    account: str
-    balance: int
-
-
-class Order(BaseModel):
+class NewOrderForm(BaseModel):
     user_id: int
     store_id: int
-    books: List[Tuple[str, int]]  # (id, num)
-    deal_id: int
+    id_and_num: List[Tuple[str, int]]  # (id, num)
 
 
 @app.post("/new_order")
-async def new_order(order: Order):
+async def new_order(form: NewOrderForm):
     code, msg, order_id = buyer.new_order(
-        user_id = order.user_id,
-        store_id = order.store_id,
-        id_and_num = order.books
+        user_id=form.user_id,
+        store_id=form.store_id,
+        id_and_num=form.id_and_num
     )
     return JSONResponse({"message": msg, "order_id": order_id}, status_code=code)
 
@@ -58,7 +49,7 @@ async def add_funds(form: FundsForm):
     # 增加个人账户余额
     code, msg = buyer.add_funds(
        user_id=form.user_id,
-       add_value = form.add_value
+       add_value=form.add_value
     )
     return JSONResponse({"message": msg}, status_code=code)
 
@@ -79,10 +70,19 @@ async def receive_book(form: ReceiveBookForm):
     return JSONResponse({"message": msg}, status_code=code)
 
 
+class HistoryForm(BaseModel):
+    user_id: int
+
+
 @app.get("/history")
-async def history(usr: User):
-    code, msg = buyer.query_deal_hist(usr.uid)
+async def history(form: HistoryForm):
+    code, msg = buyer.query_deal_hist(form.user_id)
     return JSONResponse({"message": msg}, status_code=code)
+
+
+class Cancel_deal_form(BaseModel):
+    user_id: int
+    deal_id: int
 
 
 @app.post("/cancel_deal")

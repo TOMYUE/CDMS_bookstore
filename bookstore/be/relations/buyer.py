@@ -22,7 +22,7 @@ def new_order(user_id: int, store_id: int, id_and_num: List[Tuple[str, int]]) ->
             if buyer is None:
                 return 501, f"error_non_exist_user_id{user_id}", []
             # check if store exists
-            store = session.query(StoreOwner).filger(StoreOwner.sid == store_id).first()
+            store = session.query(StoreOwner).filter(StoreOwner.sid == store_id).first()
             if store is None:
                 return 502, f"error_non_exist_store_id{store_id}", []
             # add each into the deal
@@ -30,11 +30,11 @@ def new_order(user_id: int, store_id: int, id_and_num: List[Tuple[str, int]]) ->
                 if b_num <= 0:
                     continue
                 store_book = session.query(Store).filter((Store.sid == store_id) and (Store.bid == bid)).first()
+                book_info = session.query(Book).filter((Book.bid == bid)).first()
+                book_price = book_info.price
                 if store_book is None:
                     return 503, f"book not in store {store_id}", []
                 elif store_book.inventory_quantity < b_num:
-                    # TODO: there is a problem if in all books that he buy, there's only one that have no enough num,
-                    #  simply return is very much unnecessary
                     return 503, f"book not in store {bid}", []
                 # update inventory_quantity
                 store_book.inventory_quantity -= b_num
@@ -42,15 +42,13 @@ def new_order(user_id: int, store_id: int, id_and_num: List[Tuple[str, int]]) ->
                 # add new deal to the deal relation
                 deal = Deal(uid=user_id, sid=store_id, bid=bid,
                             order_time=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
-                            status=deal_status["下单"], money=store_book.price * b_num)
+                            status=deal_status["下单"], money=book_price* b_num)
                 session.add(deal)
-
-            # get all the deal that this customer buy recently
-            # TODO: how to get the auto increment id of the deal, when it has just created
-            filter_condition = (Deal.uid == user_id) and (Deal.sid == store_id) and (Deal.status == deal_status["下单"])
-            buyer_deals = session.query(Deal).filter(filter_condition).all()
-            # get all the deal id of this customers current deal
-            deal_id = [i.did for i in buyer_deals]
+            res = session.execute(f'''select * from "Deal";''')
+            deal_id = []
+            for i in res:
+                print(i[1])
+                deal_id.append(i.did)
             session.commit()
             return 200, "ok", deal_id
     except Exception as e:
