@@ -7,6 +7,7 @@ from typing import *
 import jwt
 import time
 import sqlalchemy
+from add_books_for_search import *
 
 def jwt_encode(user_id: str, terminal: str) -> str:
     encoded = jwt.encode(
@@ -222,9 +223,9 @@ def search_title(title:str, page:int):
         with db_session() as session:
             pageSize = 10
             if page > 0:
-                results = session.query(Book).filter(Book.title == title).order_by(Book.price).limit(pageSize).offset(pageSize * (page-1)).all()
+                results = session.query(Search_title, Book).filter(Search_title.title == title).filter(Book.bid == Search_title.book_id).order_by(Book.price).limit(pageSize).offset(pageSize * (page-1)).all()
             else:
-                results = session.query(Book).filter(Book.title == title).order_by(Book.price).all()
+                results = session.query(Search_title, Book).filter(Search_title.title == title).filter(Book.bid == Search_title.book_id).order_by(Book.price).all()
             if len(results) > 0:
                 return 200, "ok"
             else:
@@ -241,8 +242,8 @@ def search_title_in_store(title:str, page:int, sid:int):
             if stores is None:
                 return 506, f"store_not_exists{sid}"
             if page > 0:
-                results = session.query(Book, Store).join(Store,Store.bid == Book.bid).\
-                        filter(Book.title == title and Store.sid == sid).order_by(Book.price).limit(pageSize).offset(pageSize * (page-1)).all()
+                results = session.query(Search_title,Book, Store).filter(Search_title.title == title).join(Store,Store.bid == Book.bid).\
+                        filter(Store.sid == sid).order_by(Book.price).limit(pageSize).offset(pageSize * (page-1)).all()
             else:
                 results = session.query(Book, Store).join(Store, Store.bid == Book.bid). \
                     filter(Book.title == title and Store.sid == sid).order_by(Book.price).all()
@@ -263,9 +264,9 @@ def search_tag(tag:str, page:int):
             #     pageSize * max(0, page - 1)).all()
 
             if page > 0:
-                results = session.query(Book).filter(Book.tags.contains(tag)).order_by(Book.price).limit(pageSize).offset(pageSize * (page-1)).all()
+                results = session.query(Book,Search_tags).filter(Search_tags.tags == tag).filter(Book.bid == Search_tags.book_id).order_by(Book.price).limit(pageSize).offset(pageSize * (page-1)).all()
             else:
-                results = session.query(Book).filter(Book.tags.contains(tag)).order_by(Book.price).all()
+                results = session.query(Book,Search_tags).filter(Search_tags.tags == tag).filter(Book.bid == Search_tags.book_id).order_by(Book.price).all()
             if len(results):
                 session.commit()
                 return 200,"ok"
@@ -284,9 +285,9 @@ def search_tag_in_store(tag:str, page:int, sid:int):
             if stores is None:
                 return 506, f"store_not_exists{sid}"
             if page > 0:
-                results = session.query(Book,Store).join(Store, Store.bid == Book.bid).filter(Book.tags.contains(tag)).filter(Store.sid == sid).order_by(Book.price).limit(pageSize).offset(pageSize * (page-1)).all()
+                results = session.query(Book,Store,Search_tags).filter(Search_tags.tags == tag).join(Store, Store.bid == Book.bid).filter(Store.sid == sid).order_by(Book.price).limit(pageSize).offset(pageSize * (page-1)).all()
             else:
-                results = session.query(Book,Store).join(Store, Store.bid == Book.bid).filter(Book.tags.contains(tag)).filter(Store.sid == sid).order_by(Book.price).all()
+                results = session.query(Book,Store,Search_tags).filter(Search_tags.tags == tag).join(Store, Store.bid == Book.bid).filter(Store.sid == sid).order_by(Book.price).all()
             if len(results):
                 session.commit()
                 return 200,"ok"
@@ -303,9 +304,9 @@ def search_content(book_intro:str, page:int):
             # results = session.query(Book).filter(Book.book_intro.contains(book_intro)).limit(pageSize).offset(pageSize * (page - 1)).all()
             # return 200, "ok"
             if page > 0:
-                results = session.query(Book).filter(Book.book_intro.like("%"+book_intro+"%")).limit(pageSize).offset(pageSize * (page - 1)).all()
+                results = session.query(Book,Search_book_intro).filter(Search_book_intro.book_intro == book_intro).filter(Search_book_intro.book_id == Book.bid).limit(pageSize).offset(pageSize * (page - 1)).all()
             else:
-                results = session.query(Book).filter(Book.book_intro.contains(book_intro)).all()
+                results = session.query(Book,Search_book_intro).filter(Search_book_intro.book_intro == book_intro).filter(Search_book_intro.book_id == Book.bid).all()
             if len(results):
                 session.commit()
                 return 200, "ok"
@@ -323,9 +324,9 @@ def search_content_in_store(book_intro:str, page:int, sid:int):
             if stores is None:
                 return 506, f"store_not_exists{sid}"
             if page > 0:
-                results = session.query(Book,Store).join(Store, Store.bid == Book.bid).filter(Book.book_intro.contains(book_intro)).filter(Store.sid == sid).limit(pageSize).offset(pageSize * (page - 1)).all()
+                results = session.query(Book,Store).filter(Search_book_intro.book_id == Book.bid).join(Store, Store.bid == Book.bid).filter(Book.book_intro.contains(book_intro)).filter(Store.sid == sid).limit(pageSize).offset(pageSize * (page - 1)).all()
             else:
-                results = session.query(Book,Store).join(Store, Store.bid == Book.bid).filter(Book.book_intro.contains(book_intro)).filter(Store.sid == sid).all()
+                results = session.query(Book,Store).filter(Search_book_intro.book_id == Book.bid).join(Store, Store.bid == Book.bid).filter(Book.book_intro.contains(book_intro)).filter(Store.sid == sid).all()
             if len(results):
                 session.commit()
                 return 200, "ok"
@@ -340,9 +341,9 @@ def search_author(author:str, page):
         with db_session() as session:
             pageSize = 10
             if page > 0:
-                results = session.query(Book).filter(Book.author == author).order_by(Book.price).limit(pageSize).offset(pageSize * (page-1)).all()
+                results = session.query(Book, Search_author).filter(Search_author.author == author).filter(Book.author == author).order_by(Book.price).limit(pageSize).offset(pageSize * (page-1)).all()
             else:
-                results = session.query(Book).filter(Book.author == author).order_by(Book.price).all()
+                results = session.query(Book).filter(Search_author.author == author).filter(Book.author == author).order_by(Book.price).all()
             if len(results):
                 session.commit()
                 return 200, "ok"
@@ -361,10 +362,10 @@ def search_author_in_store(author:str, page:int, sid:int):
             if stores is None:
                 return 506, f"store_not_exists{sid}"
             if page > 0:
-                results = session.query(Book, Store).join(Store,Store.bid == Book.bid).\
+                results = session.query(Book, Store).filter(Search_author.author == author).join(Store,Store.bid == Book.bid).\
                         filter(Book.author == author and Store.sid == sid).order_by(Book.price).limit(pageSize).offset(pageSize * (page-1)).all()
             else:
-                results = session.query(Book, Store).join(Store, Store.bid == Book.bid). \
+                results = session.query(Book, Store).filter(Search_author.author == author).join(Store, Store.bid == Book.bid). \
                     filter(Book.author == author and Store.sid == sid).order_by(Book.price).all()
             if len(results):
                 return 200, "ok"
