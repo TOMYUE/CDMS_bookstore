@@ -18,20 +18,19 @@ def new_order(user_id: int, store_id: int, id_and_num: List[Tuple[str, int]]) ->
     try:
         with db_session() as session:
             # check if user exists
-            buyer = session.query(Buyer).filter(Buyer.uid == user_id).first()
+            buyer = session.query(Buyer).filter(Buyer.uid == user_id).one()
             if buyer is None:
                 return 501, f"error_non_exist_user_id{user_id}", []
             # check if store exists
-            store = session.query(StoreOwner).filter(StoreOwner.sid == store_id).first()
+            store = session.query(StoreOwner).filter(StoreOwner.sid == store_id).one()
             if store is None:
                 return 502, f"error_non_exist_store_id{store_id}", []
             # add each into the deal
             for bid, b_num in id_and_num:
                 if b_num <= 0:
                     continue
-                store_book = session.query(Store).filter((Store.sid == store_id) and (Store.bid == bid)).first()
-                book_info = session.query(Book).filter((Book.bid == bid)).first()
-                book_price = book_info.price
+                store_book = session.query(Store).filter(Store.sid == store_id).filter(Store.bid == bid).one()
+                # book_price = book_info.price
                 if store_book is None:
                     return 503, f"book not in store {store_id}", []
                 elif store_book.inventory_quantity < b_num:
@@ -44,7 +43,7 @@ def new_order(user_id: int, store_id: int, id_and_num: List[Tuple[str, int]]) ->
                             order_time=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
                             status=deal_status["下单"], money=store_book.price * b_num, amount=b_num)
                 session.add(deal)
-            res = session.execute(f'''select * from "Deal";''')
+            res = session.execute(f'''select did from "Deal";''')
             deal_id = []
             for i in res:
                 print(i[1])
@@ -135,40 +134,71 @@ def history(uid):
     try: 
         with db_session() as session:
             deal_list = session.query(Deal).filter(Deal.uid == uid).all()
+            deal_list = [deal.dict() for deal in list(deal_list)]
             session.commit()
-        return 200, [deal.dict() for deal in deal_list]
+        return 200, deal_list
     except Exception as e:
         return 500, f'{e}'
 
 
 # input: user id, deal id
+# def cancel_deal(uid, did):
+#     try:
+#         with db_session() as session:
+#             result = session.query(Deal)\
+#                 .filter(Deal.uid == uid and Deal.did == did)
+#             deal = result.one()
+#             bid = deal.bid
+#             amount = deal.amount
+#             money = deal.money
+#             sid = deal.sid
+#             uid = deal.uid
+#             print("------through here-------")
+#             print("xxxxxxxxxxxxxx")
+#             store = session.query(Store)\
+#                 .filter(Store.bid == bid)\
+#                 .filter(Store.sid == sid)
+#             seller_id = store.one().uid
+#             store.update({"inventory_quantity": Store.inventory_quantity+amount})
+#             session.query(Buyer)\
+#                 .filter(Buyer.uid == uid)\
+#                 .update({Buyer.balance: Buyer.balance+money})
+#             session.query(Seller)\
+#                 .filter(Seller.uid == seller_id)\
+#                 .update({Seller.balance: Seller.balance+money})
+#             print("xxxxxxxxxxxxxx")
+#             print("------through here-------")
+#             print("xxxxxxxxxxxxxx")
+#             result.update({"status": deal_status["取消"]})
+#             session.commit()
+#         return 200, f'{result}'
+#     except Exception as e:
+#         return 500, f'{e}'
+
+# def cancel_deal(uid, did):
+#     try:
+#         with db_session() as session:
+#             result = session.query(Deal)\
+#                 .filter(Deal.uid == uid and Deal.did == did)
+#             bid = result.one().bid
+#             result.update({"status": deal_status["取消"]})
+#             session.query(Store)\
+#                 .filter(Store.bid == bid)\
+#                 .update({"inventory_quantity": Store.inventory_quantity+1})
+#             session.commit()
+#         return 200, f'{result}'
+#     except Exception as e:
+#         return 500, f'{e}'
+
 def cancel_deal(uid, did):
     try:
         with db_session() as session:
-            result = session.query(Deal)\
-                .filter(Deal.uid == uid and Deal.did == did)
-            deal = result.one()
-            bid = deal.bid
-            amount = deal.amount
-            money = deal.money
-            sid = deal.sid
-            uid = deal.uid
-            store = session.query(Store)\
-                .filter(Store.bid == bid)\
-                .filter(Store.sid == sid)
-            seller_id = store.one().uid
-            store.update({"inventory_quantity": Store.inventory_quantity+amount})
-            if deal.status == deal_status["付款"]:
-                session.query(Buyer)\
-                    .filter(Buyer.uid == uid)\
-                    .update({Buyer.balance: Buyer.balance+money})
-                session.query(Seller)\
-                    .filter(Seller.uid == seller_id)\
-                    .update({Seller.balance: Seller.balance+money})
-            if deal.status == deal_status["发货"]:
-                raise Exception("商家已经发货, 不能退货")
-            result.update({"status": deal_status["取消"]})
-            session.commit()
-        return 200, f'Success: {result}'
+            filter_condition = (Deal.uid == uid) and (Deal.did == did)
+            buyer_deals = session.query(Deal).filter(filter_condition).all()
+            for deal in buyer_deals:
+                deal.status = deal_status["取消"]
+                session.add(deal)
+                session.commit()
+            return 200, "Success"
     except Exception as e:
         return 500, f'Failure: {e}'

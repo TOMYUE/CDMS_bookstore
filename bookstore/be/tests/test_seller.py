@@ -81,7 +81,7 @@ class SellerRequest(AuthRequest):
             "pictures": pictures,
         }
         response = self.cli.post("/seller/add_book", json=json)
-        assert response.status_code == expected_code
+        assert response.status_code == expected_code, response.content
 
     def add_rand_book(self, expected_code):
         book = rand_book()
@@ -92,7 +92,7 @@ class SellerRequest(AuthRequest):
         expected_code,
         user_id: int, 
         book_id: str, 
-        store_id: int, 
+        store_id: int,
         add_stock_level: int, 
     ):
         json = {
@@ -102,16 +102,25 @@ class SellerRequest(AuthRequest):
             "add_stock_level": add_stock_level
         }
         response = self.cli.post("/seller/add_stock_level", json=json)
-        assert response.status_code == expected_code
+        assert response.status_code == expected_code, response.content
 
-    def change_price(self, expeced_code, store_id: int, book_id: int, price: int):
+    def change_price(self, expected_code, store_id: int, book_id: int, price: int):
         json = {
             "store_id": store_id,
             "book_id": book_id,
             "price": price
         }
         response = self.cli.post("/seller/change_price", json=json)
-        assert response.status_code == expeced_code
+        assert response.status_code == expected_code, response.content
+
+    def query_price(self, expected_code, store_id: int, book_id: int):
+        json = {
+            "store_id": store_id,
+            "book_id": book_id,
+        }
+        response = self.cli.post("/seller/query_price", json=json)
+        assert response.status_code == expected_code, response.content
+        return response.json()
 
     def query_stock_level(self, 
         expected_code, 
@@ -134,7 +143,7 @@ class SellerRequest(AuthRequest):
             "page": page
         }
         response = self.cli.post("/auth/search_title", json=json)
-        assert response.status_code == expected_code
+        assert response.status_code == expected_code, response.content
         return {}
 
     def search_title_in_store(self, title, page, sid, expected_code):
@@ -144,7 +153,7 @@ class SellerRequest(AuthRequest):
             "sid": sid
         }
         response = self.cli.post("/auth/search_title_in_store",json=json)
-        assert response.status_code == expected_code
+        assert response.status_code == expected_code, response.content
         return {}
 
     def search_tag(self, tag, page, expected_code):
@@ -153,7 +162,7 @@ class SellerRequest(AuthRequest):
             "page": page
         }
         response = self.cli.post("/auth/search_tag", json=json)
-        assert response.status_code == expected_code
+        assert response.status_code == expected_code, response.content
         return {}
 
     def search_tag_in_store(self, tag, page, sid, expected_code):
@@ -163,7 +172,7 @@ class SellerRequest(AuthRequest):
             "sid": sid
         }
         response = self.cli.post("/auth/search_tag_in_store", json=json)
-        assert response.status_code == expected_code
+        assert response.status_code == expected_code, response.content
         return {}
 
     def search_content(self, book_intro, page, expected_code):
@@ -172,7 +181,7 @@ class SellerRequest(AuthRequest):
             "page": page
         }
         response = self.cli.post("/auth/search_content", json=json)
-        assert response.status_code == expected_code
+        assert response.status_code == expected_code, response.content
         return {}
 
     def search_content_in_store(self, book_intro, page, sid, expected_code):
@@ -182,7 +191,7 @@ class SellerRequest(AuthRequest):
             "sid": sid
         }
         response = self.cli.post("/auth/search_content_in_store", json=json)
-        assert response.status_code == expected_code
+        assert response.status_code == expected_code, response.content
         return {}
 
     def search_author(self, author, page, expected_code):
@@ -191,7 +200,7 @@ class SellerRequest(AuthRequest):
             "page": page
         }
         response = self.cli.post("/auth/search_author", json=json)
-        assert response.status_code == expected_code
+        assert response.status_code == expected_code, response.content
         return {}
 
     def search_author_in_store(self, author, page, sid, expected_code):
@@ -201,7 +210,7 @@ class SellerRequest(AuthRequest):
             "sid": sid
         }
         response = self.cli.post("/auth/search_author_in_store", json=json)
-        assert response.status_code == expected_code
+        assert response.status_code == expected_code, response.content
         return {}
 # ************************************* write test_* functions here, utilize these tools ************************************* #
 
@@ -242,6 +251,7 @@ def test_change_price():
     seller.add_stock_level(200, seller_info["uid"], book_id=str(book["id"]), store_id=store_id, add_stock_level=5)
     assert seller.query_stock_level(200, seller_info["uid"], book_id=book["id"], store_id=store_id)["message"] == 5
     seller.change_price(200, store_id=store_id, book_id=book["id"], price=10)
+    assert seller.query_price(200, store_id=store_id, book_id=book["id"])["message"] == 10
 
 def test_search():
     seller = SellerRequest()

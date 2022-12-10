@@ -20,7 +20,7 @@ class AuthRequest:
             "terminal": str(uuid1())
         }
         response = self.cli.post("/auth/seller/register", json=json)
-        assert response.status_code == expected_code
+        assert response.status_code == expected_code, response.content
         res = response.json()
         json.update({"uid": res['uid']})
         return json
@@ -35,7 +35,7 @@ class AuthRequest:
             "terminal": str(uuid1())
         }
         response = self.cli.post("/auth/buyer/register", json=json)
-        assert response.status_code == expected_code
+        assert response.status_code == expected_code, response.content
         res = response.json()
         json.update({"uid": res['uid']})
         return json
@@ -47,7 +47,7 @@ class AuthRequest:
             "terminal": terminal
         }
         response = self.cli.post("/auth/seller/login",json=json)
-        assert response.status_code == expected_code
+        assert response.status_code == expected_code, response.content
         return {
             "uname": uname,
             "password": password
@@ -60,7 +60,7 @@ class AuthRequest:
             "terminal": terminal
         }
         response = self.cli.post("/auth/buyer/login",json=json)
-        assert response.status_code == expected_code
+        assert response.status_code == expected_code, response.content
         return {
             "uname": uname,
             "password": password
@@ -73,7 +73,7 @@ class AuthRequest:
                 "token":token
         }
         response = self.cli.post("/auth/seller/logout",json=json)
-        assert response.status_code == expected_code
+        assert response.status_code == expected_code, response.content
         return {}
 
     def buyer_logout(self,uname, token, expected_code=200):
@@ -82,7 +82,7 @@ class AuthRequest:
                 "token":token
         }
         response = self.cli.post("/auth/buyer/logout",json=json)
-        assert response.status_code == expected_code
+        assert response.status_code == expected_code, response.content
         return {}
 
     def seller_ungister(self, uname, pwd, expected_code=200):
@@ -91,7 +91,7 @@ class AuthRequest:
             "password":pwd
         }
         response= self.cli.post("/auth/seller/unregister",json=json)
-        assert response.status_code == expected_code
+        assert response.status_code == expected_code, response.content
         return {}
 
     def buyer_ungister(self, uname, pwd, expected_code=200):
@@ -100,7 +100,7 @@ class AuthRequest:
             "password":pwd
         }
         response= self.cli.post("/auth/buyer/unregister",json=json)
-        assert response.status_code == expected_code
+        assert response.status_code == expected_code, response.content
         return {}
 
     def seller_change_pwd(self, uname,old_password, new_password, expected_code):
@@ -110,7 +110,7 @@ class AuthRequest:
             "new_password":new_password
         }
         response = self.cli.post("/auth/seller/password",json=json)
-        assert response.status_code == expected_code
+        assert response.status_code == expected_code, response.content
         return {}
 
     def buyer_change_pwd(self, uname,old_password, new_password, expected_code):
@@ -120,7 +120,7 @@ class AuthRequest:
             "new_password":new_password
         }
         response = self.cli.post("/auth/buyer/password",json=json)
-        assert response.status_code == expected_code
+        assert response.status_code == expected_code, response.content
         return {}
 
 # ************************************* write test_* functions here, utilize these tools ************************************* #

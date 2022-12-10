@@ -24,8 +24,7 @@ class BuyerRequest:
             "id_and_num": [(book_id, quantity)]
         }
         response = self.cli.post("/buyer/new_order", json=json)
-        print(response.json())
-        assert response.status_code == expected_code
+        assert response.status_code == expected_code, response.content
 
     def payment(self, expected_code, buyer_id, store_id):
         json = {
@@ -33,7 +32,7 @@ class BuyerRequest:
             "store_id": store_id
         }
         response = self.cli.post("/buyer/payment", json=json)
-        assert response.status_code == expected_code
+        assert response.status_code == expected_code, response.content
         return json
 
     def add_funds(self, expected_code, value, buyer_id):
@@ -42,7 +41,7 @@ class BuyerRequest:
             "add_value": value
         }
         response = self.cli.post("/buyer/add_funds", json=json)
-        assert response.status_code == expected_code
+        assert response.status_code == expected_code, response.content
         return json
 
     def receive_book(self, expected_code, buyer_id, store_id, deal_id):
@@ -52,7 +51,7 @@ class BuyerRequest:
             "deal_id": deal_id
         }
         response = self.cli.post("/buyer/receive_book", json=json)
-        assert response.status_code == expected_code
+        assert response.status_code == expected_code, response.content
         return json
 
     def history(self, expected_code, buyer_id):
@@ -60,7 +59,7 @@ class BuyerRequest:
             "user_id": buyer_id
         }
         response = self.cli.post("/buyer/history", json=json)
-        assert response.status_code == expected_code
+        assert response.status_code == expected_code, response.content
         return json
 
     def cancel_deal(self, expected_code, buyer_id, deal_id):
@@ -97,6 +96,7 @@ def test_new_order():
     store_id = int(uuid1()) % 1000
     seller.create_store(200, seller_info["uid"], store_id)
     seller.add_stock_level(200, seller_info["uid"], book_id, store_id, add_stock_level)
+    seller.change_price(200, store_id, book_id, 200)
     buyer.new_order(200, buyer_info['uid'], store_id, book_id, 1)
 
 
@@ -111,6 +111,7 @@ def test_payment():
     store_id = int(uuid1()) % 1000
     seller.create_store(200, seller_info["uid"], store_id)
     seller.add_stock_level(200, seller_info["uid"], book_id, store_id, add_stock_level)
+    seller.change_price(200, store_id, book_id, 200)
     buyer.payment(200, buyer_info['uid'], store_id)
 
 
@@ -135,6 +136,7 @@ def test_receive_book():
     store_id = int(uuid1()) % 1000
     seller.create_store(200, seller_info["uid"], store_id)
     seller.add_stock_level(200, seller_info["uid"], book_id, store_id, add_stock_level)
+    seller.change_price(200, store_id, book_id, 200)
     buyer.new_order(200, buyer_info['uid'], store_id, book_id, 1)
     buyer.receive_book(200, buyer_info['uid'], store_id, 1)
 
@@ -149,6 +151,7 @@ def test_history():
     store_id = int(uuid1()) % 1000
     seller.create_store(200, seller_info["uid"], store_id)
     seller.add_stock_level(200, seller_info["uid"], book_id, store_id, add_stock_level)
+    seller.change_price(200, store_id, book_id, 200)
     buyer.new_order(200, buyer_info['uid'], store_id, book_id, 1)
     buyer.history(200, buyer_info['uid'])
 
@@ -164,5 +167,6 @@ def test_cancel_deal():
     store_id = int(uuid1()) % 1000
     seller.create_store(200, seller_info["uid"], store_id)
     seller.add_stock_level(200, seller_info["uid"], book_id, store_id, add_stock_level)
+    seller.change_price(200, store_id, book_id, 200)
     buyer.new_order(200, buyer_info['uid'], store_id, book_id, 1)
     buyer.cancel_deal(200, buyer_info['uid'], 1)

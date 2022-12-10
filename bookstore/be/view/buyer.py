@@ -74,7 +74,7 @@ class HistoryForm(BaseModel):
     user_id: int
 
 
-@app.get("/history")
+@app.post("/history")
 async def history(form: HistoryForm):
     code, msg = buyer.history(form.user_id)
     return JSONResponse({"message": msg}, status_code=code)

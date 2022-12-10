@@ -168,6 +168,18 @@ class Deal(Base):
     money = Column(Integer, nullable=False)
     amount = Column(Integer, nullable=False)
 
+    def dict(self):
+        return {
+            "did": self.did,
+            "uid": self.uid,
+            "sid": self.sid,
+            "bid": self.bid,
+            "order_time": self.order_time,
+            "status": self.status,
+            "money": self.money,
+            "amount": self.amount
+        }
+
 
 class DealBook(Base):
     """

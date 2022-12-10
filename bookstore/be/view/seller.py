@@ -75,10 +75,19 @@ async def shipping(form: ShippingForm):
 
 class ChangePriceForm(BaseModel):
     store_id: int
-    book_id: int
+    book_id: str
     price: int
 
 @app.post("/change_price")
 async def change_price(form: ChangePriceForm):
-    code, msg = seller.change_price(sid=form.seller_id, bid=form.book_id, price=form.price)
+    code, msg = seller.change_price(sid=form.store_id, bid=form.book_id, price=form.price)
+    return JSONResponse({"message": msg}, code)
+
+class QueryPriceForm(BaseModel):
+    store_id: int
+    book_id: str
+
+@app.post("/query_price")
+async def query_price(form: QueryPriceForm):
+    code, msg = seller.query_price(sid=form.store_id, bid=form.book_id)
     return JSONResponse({"message": msg}, code)

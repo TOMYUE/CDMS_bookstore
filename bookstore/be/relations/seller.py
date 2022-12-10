@@ -96,6 +96,19 @@ def change_price(sid, bid, price):
     except Exception as e:
         return 500, f"Failure: {e}"
 
+def query_price(sid, bid):
+    try: 
+        with db_session() as session:
+            result = session.query(Store)\
+                .filter(Store.sid==sid)\
+                .filter(Store.bid==bid)\
+                .one()
+            session.commit()
+            price = result.price
+        return 200, price
+    except Exception as e:
+        return 500, f"Failure: {e}"
+
 def query_stock_level(_, sid, bid):
     try: 
         with db_session() as session:
