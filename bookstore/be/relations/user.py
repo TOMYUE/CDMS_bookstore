@@ -7,6 +7,7 @@ from typing import *
 import jwt
 import time
 import sqlalchemy
+from add_books_for_search import *
 
 def jwt_encode(user_id: str, terminal: str) -> str:
     encoded = jwt.encode(
@@ -27,19 +28,15 @@ def seller_login(uname: str, pwd: str, terminal: str):
         with db_session() as session:
             token = ""
             user = session.query(Seller).filter(Seller.uname == uname).first()
-            # user = self.session.execute("SELECT pwd FROM Seller WHERE uid=:uid",{"uid":uid}).fetchone()
             if user is None :
                 code, message = 502, "non_exist_user_id"
                 return code, message, token
             if pwd != user.pwd:
                 code, message = 501, "authorization failed"
                 return code, message, token
-            # token = jwt_encode("token", terminal)
             token = "token"
             user = session.query(Seller).filter(Seller.uname == uname).update({"token" : token})
             session.commit()
-            # self.session.execute("UPDATE Seller set token= '%s' , terminal = '%s' where uid = '%s'" % (token, terminal, uid))
-            # self.session.commit()
             return 200, "ok", token
     except Exception as e:
         return 500, f"Failure: {e}", token
@@ -59,7 +56,6 @@ def buyer_login(uname: str, pwd: str, terminal: str):
                 return code, message, token
             token = "token"
             user = session.query(Buyer).filter(Buyer.uname == uname).update({"token" : token})
-            # self.session.execute("UPDATE Buyer set token= '%s' , terminal = '%s' where uid = '%s'" % (token, terminal, uid))
             session.commit()
             return 200, "ok", token
     except Exception as e:
@@ -227,10 +223,10 @@ def search_title(title:str, page:int):
         with db_session() as session:
             pageSize = 10
             if page > 0:
-                results = session.query(Book).filter(Book.title == title).order_by(Book.price.asc()).limit(pageSize).offset(pageSize * (page-1))
+                results = session.query(Search_title, Book).filter(Search_title.title == title).filter(Book.bid == Search_title.book_id).order_by(Book.price).limit(pageSize).offset(pageSize * (page-1)).all()
             else:
-                results = session.query(Book).filter(Book.title == title).order_by(Book.price.asc())
-            if results is not None:
+                results = session.query(Search_title, Book).filter(Search_title.title == title).filter(Book.bid == Search_title.book_id).order_by(Book.price).all()
+            if len(results) > 0:
                 return 200, "ok"
             else:
                 return 503, f"non_exist_book_id{title}"
@@ -242,18 +238,20 @@ def search_title_in_store(title:str, page:int, sid:int):
     try:
         with db_session() as session:
             pageSize = 10
-            stores = session.query(Store.sid).filter(Store.sid == sid)
+            stores = session.query(Store.sid).filter(Store.sid == sid).first()
             if stores is None:
                 return 506, f"store_not_exists{sid}"
             if page > 0:
-                results = session.query(Book, Store).join(Store,Store.bid == Book.bid).\
-                        filter(Book.title == title and Store.sid == sid).order_by(Book.price.asc()).limit(pageSize).offset(pageSize * (page-1))
+                results = session.query(Search_title,Book, Store).filter(Search_title.title == title).join(Store,Store.bid == Book.bid).\
+                        filter(Store.sid == sid).order_by(Book.price).limit(pageSize).offset(pageSize * (page-1)).all()
             else:
                 results = session.query(Book, Store).join(Store, Store.bid == Book.bid). \
-                    filter(Book.title == title and Store.sid == sid).order_by(Book.price.asc())
-            if results is not None:
+                    filter(Book.title == title and Store.sid == sid).order_by(Book.price).all()
+            if len(results):
+                session.commit()
                 return 200, "ok"
             else:
+                session.commit()
                 return 503, f"non_exist_book_id{title}"
     except Exception as e:
         return 500, f"Failure: {e}"
@@ -262,17 +260,18 @@ def search_tag(tag:str, page:int):
     try:
         with db_session() as session:
             pageSize = 10
+            # results = session.query(Book).filter(Book.tags.contains(tag)).order_by(Book.price).limit(pageSize).offset(
+            #     pageSize * max(0, page - 1)).all()
+
             if page > 0:
-                results = session.query(Book).filter(Book.tag.contains(tag)).order_by(Book.price).limit(pageSize).offset(pageSize * (page-1))
+                results = session.query(Book,Search_tags).filter(Search_tags.tags == tag).filter(Book.bid == Search_tags.book_id).order_by(Book.price).limit(pageSize).offset(pageSize * (page-1)).all()
             else:
-                results = session.query(Book).filter(Book.tag.contains(tag)).order_by(Book.price)
-            if results is not None:
-                res = []
-                for record in results:
-                    res.insert(record)
-                print(res)
+                results = session.query(Book,Search_tags).filter(Search_tags.tags == tag).filter(Book.bid == Search_tags.book_id).order_by(Book.price).all()
+            if len(results):
+                session.commit()
                 return 200,"ok"
             else:
+                session.commit()
                 return 504, f"non_exist_tag{tag}"
     except Exception as e:
         return 500, f"Failure: {e}"
@@ -282,20 +281,18 @@ def search_tag_in_store(tag:str, page:int, sid:int):
     try:
         with db_session() as session:
             pageSize = 10
-            stores = session.query(Store.sid).filter(Store.sid == sid)
+            stores = session.query(Store).filter(Store.sid == sid).first()
             if stores is None:
                 return 506, f"store_not_exists{sid}"
             if page > 0:
-                results = session.query(Book,Store).join(Store, Store.bid == Book.bid).filter(Book.tag.contains(tag) and Store.sid == sid).order_by(Book.price).limit(pageSize).offset(pageSize * (page-1))
+                results = session.query(Book,Store,Search_tags).filter(Search_tags.tags == tag).join(Store, Store.bid == Book.bid).filter(Store.sid == sid).order_by(Book.price).limit(pageSize).offset(pageSize * (page-1)).all()
             else:
-                results = session.query(Book,Store).join(Store, Store.bid == Book.bid).filter(Book.tag.contains(tag)and Store.sid == sid).order_by(Book.price)
-            if results is not None:
-                res = []
-                for record in results:
-                    res.insert(record)
-                print(res)
+                results = session.query(Book,Store,Search_tags).filter(Search_tags.tags == tag).join(Store, Store.bid == Book.bid).filter(Store.sid == sid).order_by(Book.price).all()
+            if len(results):
+                session.commit()
                 return 200,"ok"
             else:
+                session.commit()
                 return 504, f"non_exist_tag{tag}"
     except Exception as e:
         return 500, f"Failure: {e}"
@@ -304,17 +301,17 @@ def search_content(book_intro:str, page:int):
     try:
         with db_session() as session:
             pageSize = 10
+            # results = session.query(Book).filter(Book.book_intro.contains(book_intro)).limit(pageSize).offset(pageSize * (page - 1)).all()
+            # return 200, "ok"
             if page > 0:
-                results = session.query(Book).filter(Book.intro.contains(book_intro)).limit(pageSize).offset(pageSize * (page-1))
+                results = session.query(Book,Search_book_intro).filter(Search_book_intro.book_intro == book_intro).filter(Search_book_intro.book_id == Book.bid).limit(pageSize).offset(pageSize * (page - 1)).all()
             else:
-                results = session.query(Book).filter(Book.book_intro.contains(book_intro))
-            if results is not None:
-                res = []
-                for record in results:
-                    res.insert(record)
-                print(record)
+                results = session.query(Book,Search_book_intro).filter(Search_book_intro.book_intro == book_intro).filter(Search_book_intro.book_id == Book.bid).all()
+            if len(results):
+                session.commit()
                 return 200, "ok"
             else:
+                session.commit()
                 return 505, f"non_exist_such_content{book_intro}"
     except Exception as e:
         return 500, f"Failure:{e}"
@@ -323,20 +320,18 @@ def search_content_in_store(book_intro:str, page:int, sid:int):
     try:
         with db_session() as session:
             pageSize = 10
-            stores = session.query(Store.sid).filter(Store.sid == sid)
+            stores = session.query(Store.sid).filter(Store.sid == sid).first()
             if stores is None:
                 return 506, f"store_not_exists{sid}"
             if page > 0:
-                results = session.query(Book,Store).join(Store, Store.bid == Book.bid).filter(Book.intro.contains(book_intro) and Store.sid == sid).limit(pageSize).offset(pageSize * (page - 1))
+                results = session.query(Book,Store).filter(Search_book_intro.book_id == Book.bid).join(Store, Store.bid == Book.bid).filter(Book.book_intro.contains(book_intro)).filter(Store.sid == sid).limit(pageSize).offset(pageSize * (page - 1)).all()
             else:
-                results = session.query(Book,Store).join(Store, Store.bid == Book.bid).filter(Book.book_intro.contains(book_intro) and Store.bid == sid)
-            if results is not None:
-                res = []
-                for record in results:
-                    res.insert(record)
-                print(record)
+                results = session.query(Book,Store).filter(Search_book_intro.book_id == Book.bid).join(Store, Store.bid == Book.bid).filter(Book.book_intro.contains(book_intro)).filter(Store.sid == sid).all()
+            if len(results):
+                session.commit()
                 return 200, "ok"
             else:
+                session.commit()
                 return 505, f"non_exist_such_content{book_intro}"
     except Exception as e:
         return 500, f"Failure:{e}"
@@ -346,13 +341,15 @@ def search_author(author:str, page):
         with db_session() as session:
             pageSize = 10
             if page > 0:
-                results = session.query(Book).filter(Book.author == author).order_by(Book.price.asc()).limit(pageSize).offset(pageSize * (page-1))
+                results = session.query(Book, Search_author).filter(Search_author.author == author).filter(Book.author == author).order_by(Book.price).limit(pageSize).offset(pageSize * (page-1)).all()
             else:
-                results = session.query(Book).filter(Book.author == author).order_by(Book.price.asc())
-            if results is not None:
+                results = session.query(Book).filter(Search_author.author == author).filter(Book.author == author).order_by(Book.price).all()
+            if len(results):
+                session.commit()
                 return 200, "ok"
             else:
-                return 507, f"non_exist_book_id{author}"
+                session.commit()
+                return 507, f"non_exist_book_author{author}"
     except Exception as e:
         return 500, f"Failure: {e}"
 
@@ -361,16 +358,16 @@ def search_author_in_store(author:str, page:int, sid:int):
     try:
         with db_session() as session:
             pageSize = 10
-            stores = session.query(Store.sid).filter(Store.sid == sid)
+            stores = session.query(Store.sid).filter(Store.sid == sid).first()
             if stores is None:
                 return 506, f"store_not_exists{sid}"
             if page > 0:
-                results = session.query(Book, Store).join(Store,Store.bid == Book.bid).\
-                        filter(Book.author == author and Store.sid == sid).order_by(Book.price.asc()).limit(pageSize).offset(pageSize * (page-1))
+                results = session.query(Book, Store).filter(Search_author.author == author).join(Store,Store.bid == Book.bid).\
+                        filter(Book.author == author and Store.sid == sid).order_by(Book.price).limit(pageSize).offset(pageSize * (page-1)).all()
             else:
-                results = session.query(Book, Store).join(Store, Store.bid == Book.bid). \
-                    filter(Book.author == author and Store.sid == sid).order_by(Book.price.asc())
-            if results is not None:
+                results = session.query(Book, Store).filter(Search_author.author == author).join(Store, Store.bid == Book.bid). \
+                    filter(Book.author == author and Store.sid == sid).order_by(Book.price).all()
+            if len(results):
                 return 200, "ok"
             else:
                 return 507, f"non_exist_book_id{author}"

@@ -162,6 +162,7 @@ async def search_tag(form:searchtagGlobForm):
 class searchtagLocalForm(BaseModel):
     tag: str
     page: int
+    sid: int
 
 
 @app.post("/search_tag_in_store")
