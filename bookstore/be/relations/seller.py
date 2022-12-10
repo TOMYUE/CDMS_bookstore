@@ -122,6 +122,6 @@ def shipping(uid, sid, bid):
                 deal.status = deal_status["发货"]
                 session.add(deal)
             session.commit()
-        return 200, "Success "
+        return 200, "Success: ok"
     except Exception as e:
         return 500, f"Failure: {e}"

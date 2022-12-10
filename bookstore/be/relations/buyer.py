@@ -158,14 +158,17 @@ def cancel_deal(uid, did):
                 .filter(Store.sid == sid)
             seller_id = store.one().uid
             store.update({"inventory_quantity": Store.inventory_quantity+amount})
-            session.query(Buyer)\
-                .filter(Buyer.uid == uid)\
-                .update({Buyer.balance: Buyer.balance+money})
-            session.query(Seller)\
-                .filter(Seller.uid == seller_id)\
-                .update({Seller.balance: Seller.balance+money})
+            if deal.status == deal_status["付款"]:
+                session.query(Buyer)\
+                    .filter(Buyer.uid == uid)\
+                    .update({Buyer.balance: Buyer.balance+money})
+                session.query(Seller)\
+                    .filter(Seller.uid == seller_id)\
+                    .update({Seller.balance: Seller.balance+money})
+            if deal.status == deal_status["发货"]:
+                raise Exception("商家已经发货, 不能退货")
             result.update({"status": deal_status["取消"]})
             session.commit()
-        return 200, f'{result}'
+        return 200, f'Success: {result}'
     except Exception as e:
-        return 500, f'{e}'
+        return 500, f'Failure: {e}'

@@ -82,11 +82,11 @@ class SellerRequest(AuthRequest):
         }
         response = self.cli.post("/seller/add_book", json=json)
         assert response.status_code == expected_code
-#, response.content
+
     def add_rand_book(self, expected_code):
         book = rand_book()
         self.add_book(expected_code, **book)
-        return book    
+        return book
 
     def add_stock_level(self, 
         expected_code,
@@ -103,6 +103,15 @@ class SellerRequest(AuthRequest):
         }
         response = self.cli.post("/seller/add_stock_level", json=json)
         assert response.status_code == expected_code
+
+    def change_price(self, expeced_code, store_id: int, book_id: int, price: int):
+        json = {
+            "store_id": store_id,
+            "book_id": book_id,
+            "price": price
+        }
+        response = self.cli.post("/seller/change_price", json=json)
+        assert response.status_code == expeced_code
 
     def query_stock_level(self, 
         expected_code, 
@@ -222,6 +231,17 @@ def test_add_stock_level():
     seller.create_store(200, seller_info["uid"], store_id)
     seller.add_stock_level(200, seller_info["uid"], book_id=str(book["id"]), store_id=store_id, add_stock_level=5)
     assert seller.query_stock_level(200, seller_info["uid"], book_id=book["id"], store_id=store_id)["message"] == 5
+
+def test_change_price():
+    seller = SellerRequest()
+    book = rand_book()
+    seller.add_book(200, **book)
+    seller_info = seller.seller_register()
+    store_id = int(uuid1()) % 1000
+    seller.create_store(200, seller_info["uid"], store_id)
+    seller.add_stock_level(200, seller_info["uid"], book_id=str(book["id"]), store_id=store_id, add_stock_level=5)
+    assert seller.query_stock_level(200, seller_info["uid"], book_id=book["id"], store_id=store_id)["message"] == 5
+    seller.change_price(200, store_id=store_id, book_id=book["id"], price=10)
 
 def test_search():
     seller = SellerRequest()

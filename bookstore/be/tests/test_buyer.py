@@ -69,7 +69,7 @@ class BuyerRequest:
             "deal_id": deal_id
         }
         response = self.cli.post("/buyer/cancel_deal", json=json)
-        assert response.status_code == expected_code
+        assert response.status_code == expected_code, response.content
         return json
 
 
@@ -138,19 +138,19 @@ def test_receive_book():
     buyer.new_order(200, buyer_info['uid'], store_id, book_id, 1)
     buyer.receive_book(200, buyer_info['uid'], store_id, 1)
 
-# def test_history():
-#     auth = AuthRequest()
-#     buyer = BuyerRequest()
-#     seller = SellerRequest()
-#     book_id = '1000167'
-#     add_stock_level = 5
-#     buyer_info = auth.buyer_register(200)
-#     seller_info = auth.seller_register(200)
-#     store_id = int(uuid1()) % 1000
-#     seller.create_store(200, seller_info["uid"], store_id)
-#     seller.add_stock_level(200, seller_info["uid"], book_id, store_id, add_stock_level)
-#     buyer.new_order(200, buyer_info['uid'], store_id, book_id, 1)
-#     buyer.history(200, buyer_info['uid'])
+def test_history():
+    auth = AuthRequest()
+    buyer = BuyerRequest()
+    seller = SellerRequest()
+    book_id = '1000167'
+    add_stock_level = 5
+    buyer_info = auth.buyer_register(200)
+    seller_info = auth.seller_register(200)
+    store_id = int(uuid1()) % 1000
+    seller.create_store(200, seller_info["uid"], store_id)
+    seller.add_stock_level(200, seller_info["uid"], book_id, store_id, add_stock_level)
+    buyer.new_order(200, buyer_info['uid'], store_id, book_id, 1)
+    buyer.history(200, buyer_info['uid'])
 
 
 def test_cancel_deal():
