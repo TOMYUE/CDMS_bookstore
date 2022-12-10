@@ -137,7 +137,8 @@ class Store(Base):
     sid = Column(Integer, ForeignKey(StoreOwner.sid), primary_key=True)
     uid = Column(Integer, ForeignKey(Seller.uid))
     bid = Column(String, ForeignKey(Book.bid), primary_key=True)
-    inventory_quantity = Column(Integer, nullable=False)
+    price = Column(Integer, nullable=True)
+    inventory_quantity = Column(Integer, nullable=True)
 
 
 
@@ -165,6 +166,7 @@ class Deal(Base):
     order_time = Column(String, nullable=False)
     status = Column(Integer, nullable=False)
     money = Column(Integer, nullable=False)
+    amount = Column(Integer, nullable=False)
 
 
 class DealBook(Base):

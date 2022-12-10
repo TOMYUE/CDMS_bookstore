@@ -82,6 +82,20 @@ def add_stock_level(uid, sid, bid, stock_level_delta):
     except Exception as e:
         return 500, f"Failure: {e}"
 
+def change_price(sid, bid, price):
+    try: 
+        with db_session() as session:
+            result = session.query(Store)\
+                .filter(Store.sid==sid)\
+                .filter(Store.bid==bid)\
+                .update({Store.price: price})
+            if result == 0:
+                raise Exception("no such book to update")
+            session.commit()
+        return 200, f"Success: update {result}"
+    except Exception as e:
+        return 500, f"Failure: {e}"
+
 def query_stock_level(_, sid, bid):
     try: 
         with db_session() as session:
@@ -109,18 +123,5 @@ def shipping(uid, sid, bid):
                 session.add(deal)
             session.commit()
         return 200, "Success "
-    except Exception as e:
-        return 500, f"Failure: {e}"
-
-
-def add_book_to_store(uid:int, sid:int, bid:str, quantity:int):
-    try:
-        with db_session() as session:
-            filter_condition = (Store.uid == uid) and (Store.sid == sid) and (Store.bid == bid)
-            store_book = session.query(Store).filter(filter_condition)
-            store_book.inventory_quantity = quantity
-            session.add(store_book)
-            session.commit()
-        return 200, "Success"
     except Exception as e:
         return 500, f"Failure: {e}"

@@ -72,3 +72,13 @@ async def shipping(form: ShippingForm):
         form.book_id
     )
     return JSONResponse({"message": msg}, code)
+
+class ChangePriceForm(BaseModel):
+    store_id: int
+    book_id: int
+    price: int
+
+@app.post("/change_price")
+async def change_price(form: ChangePriceForm):
+    code, msg = seller.change_price(sid=form.seller_id, bid=form.book_id, price=form.price)
+    return JSONResponse({"message": msg}, code)
