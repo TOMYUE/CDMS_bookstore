@@ -3,8 +3,12 @@ from sqlalchemy import create_engine, MetaData, inspect
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-SQLALCHEMY_DATABASE_URL = "postgresql://stu10205501461:" \
-                          "Stu10205501461@dase-cdms-2022-pub.pg.rds.aliyuncs.com:5432/stu10205501461"
+# SQLALCHEMY_DATABASE_URL = "postgresql://stu10205501461:" \
+#                           "Stu10205501461@dase-cdms-2022-pub.pg.rds.aliyuncs.com:5432/stu10205501461"
+
+
+SQLALCHEMY_DATABASE_URL = "postgresql://stu10205501402:" \
+                          "Stu10205501402@dase-cdms-2022-pub.pg.rds.aliyuncs.com:5432/stu10205501402"
 
 # initialization
 engine = create_engine(SQLALCHEMY_DATABASE_URL,
@@ -90,8 +94,6 @@ class Book_bp(Base):
 
 Base.metadata.create_all(engine)
 
-with open("book.sql", "r+") as f:
-    # line = f.readline()
-    # engine.connect().execute(line)
+with open("relations/scripts/book.sql", "r+", encoding="utf-8") as f:
     sql = f.read()
     engine.connect().execute(sql)

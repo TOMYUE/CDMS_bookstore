@@ -12,6 +12,9 @@ Base = declarative_base()
 SQLALCHEMY_DATABASE_URL = "postgresql://stu10205501402:" \
                           "Stu10205501402@dase-cdms-2022-pub.pg.rds.aliyuncs.com:5432/stu10205501402"
 
+# SQLALCHEMY_DATABASE_URL = "postgresql://stu10205501461:" \
+#                           "Stu10205501461@dase-cdms-2022-pub.pg.rds.aliyuncs.com:5432/stu10205501461"
+
 # initialization
 engine = create_engine(SQLALCHEMY_DATABASE_URL,
     echo=True,

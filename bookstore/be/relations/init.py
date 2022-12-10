@@ -5,8 +5,10 @@ from sqlalchemy.orm import sessionmaker
 
 
 # SQLALCHEMY_DATABASE_URL = "postgresql://postgres:123456@localhost:5432/tangyue"
-SQLALCHEMY_DATABASE_URL = "postgresql://stu10205501461:" \
-                          "Stu10205501461@dase-cdms-2022-pub.pg.rds.aliyuncs.com:5432/stu10205501461"
+# SQLALCHEMY_DATABASE_URL = "postgresql://stu10205501461:" \
+#                           "Stu10205501461@dase-cdms-2022-pub.pg.rds.aliyuncs.com:5432/stu10205501461"
+SQLALCHEMY_DATABASE_URL = "postgresql://stu10205501402:" \
+                          "Stu10205501402@dase-cdms-2022-pub.pg.rds.aliyuncs.com:5432/stu10205501402"
 
 # initialization
 engine = create_engine(SQLALCHEMY_DATABASE_URL,
