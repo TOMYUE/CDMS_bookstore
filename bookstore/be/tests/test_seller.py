@@ -233,7 +233,7 @@ def test_search():
         seller_info = seller.seller_register()
         store_id = int(uuid1())%1000
         seller.create_store(200, seller_info['uid'], store_id)
-        seller.add_stock_level(200, seller_info["uid"], book_id=str(book["id"]), store_id=store_id, add_stock_level=5)
+        seller.add_stock_level(200, seller_info["uid"], book_id=str(book["id"]), store_id=store_id, price=200, add_stock_level=5)
 
     # seller.search_title("我爱数据库",1,200)
     seller.search_title("",1,503)
