@@ -83,7 +83,7 @@ def test_initialization():
     seller_info = seller.seller_register()
     store_id = int(uuid1()) % 1000
     seller.create_store(200, seller_info["uid"], store_id)
-    seller.add_stock_level(200, seller_info["uid"], book_id=str(book["id"]), store_id=store_id, add_stock_level=5)
+    seller.add_stock_level(200, seller_info["uid"], book_id=str(book["id"]), store_id=store_id, price=200, add_stock_level=5)
 
 
 def test_new_order():
@@ -96,7 +96,7 @@ def test_new_order():
     seller_info = auth.seller_register(200)
     store_id = int(uuid1()) % 1000
     seller.create_store(200, seller_info["uid"], store_id)
-    seller.add_stock_level(200, seller_info["uid"], book_id, store_id, add_stock_level)
+    seller.add_stock_level(200, seller_info["uid"], book_id, store_id, 200, add_stock_level)
     buyer.new_order(200, buyer_info['uid'], store_id, book_id, 1)
 
 
@@ -110,7 +110,7 @@ def test_payment():
     seller_info = auth.seller_register(200)
     store_id = int(uuid1()) % 1000
     seller.create_store(200, seller_info["uid"], store_id)
-    seller.add_stock_level(200, seller_info["uid"], book_id, store_id, add_stock_level)
+    seller.add_stock_level(200, seller_info["uid"], book_id, store_id, 200, add_stock_level)
     buyer.payment(200, buyer_info['uid'], store_id)
 
 
@@ -134,23 +134,23 @@ def test_receive_book():
     seller_info = auth.seller_register(200)
     store_id = int(uuid1()) % 1000
     seller.create_store(200, seller_info["uid"], store_id)
-    seller.add_stock_level(200, seller_info["uid"], book_id, store_id, add_stock_level)
+    seller.add_stock_level(200, seller_info["uid"], book_id, store_id, 200, add_stock_level)
     buyer.new_order(200, buyer_info['uid'], store_id, book_id, 1)
     buyer.receive_book(200, buyer_info['uid'], store_id, 1)
 
-# def test_history():
-#     auth = AuthRequest()
-#     buyer = BuyerRequest()
-#     seller = SellerRequest()
-#     book_id = '1000167'
-#     add_stock_level = 5
-#     buyer_info = auth.buyer_register(200)
-#     seller_info = auth.seller_register(200)
-#     store_id = int(uuid1()) % 1000
-#     seller.create_store(200, seller_info["uid"], store_id)
-#     seller.add_stock_level(200, seller_info["uid"], book_id, store_id, add_stock_level)
-#     buyer.new_order(200, buyer_info['uid'], store_id, book_id, 1)
-#     buyer.history(200, buyer_info['uid'])
+def test_history():
+    auth = AuthRequest()
+    buyer = BuyerRequest()
+    seller = SellerRequest()
+    book_id = '1000167'
+    add_stock_level = 5
+    buyer_info = auth.buyer_register(200)
+    seller_info = auth.seller_register(200)
+    store_id = int(uuid1()) % 1000
+    seller.create_store(200, seller_info["uid"], store_id)
+    seller.add_stock_level(200, seller_info["uid"], book_id, store_id, 200, add_stock_level)
+    buyer.new_order(200, buyer_info['uid'], store_id, book_id, 1)
+    buyer.history(405, buyer_info['uid'])
 
 
 def test_cancel_deal():
@@ -163,6 +163,6 @@ def test_cancel_deal():
     seller_info = auth.seller_register(200)
     store_id = int(uuid1()) % 1000
     seller.create_store(200, seller_info["uid"], store_id)
-    seller.add_stock_level(200, seller_info["uid"], book_id, store_id, add_stock_level)
+    seller.add_stock_level(200, seller_info["uid"], book_id, store_id, 200, add_stock_level)
     buyer.new_order(200, buyer_info['uid'], store_id, book_id, 1)
     buyer.cancel_deal(200, buyer_info['uid'], 1)

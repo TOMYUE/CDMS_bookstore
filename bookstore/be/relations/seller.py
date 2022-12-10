@@ -62,7 +62,7 @@ def add_book(*,
         return 500, f"Failure: {e}"
 
 
-def add_stock_level(uid, sid, bid, stock_level_delta):
+def add_stock_level(uid, sid, bid, price, stock_level_delta):
     try: 
         with db_session() as session:
             ownership = session.query(StoreOwner)\
@@ -76,7 +76,8 @@ def add_stock_level(uid, sid, bid, stock_level_delta):
                 .filter(Store.bid==bid)\
                 .update({"inventory_quantity": Store.inventory_quantity+stock_level_delta})
             if result == 0:
-                result = session.add(Store(sid=sid, bid=bid, uid=uid, inventory_quantity=stock_level_delta))
+                result = session.add(Store(sid=sid, bid=bid, uid=uid, price=price, inventory_quantity=stock_level_delta))
+            change_price(sid, bid, price)
             session.commit()
         return 200, f"Success: {result}"
     except Exception as e:

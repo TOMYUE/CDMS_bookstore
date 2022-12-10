@@ -92,13 +92,15 @@ class SellerRequest(AuthRequest):
         expected_code,
         user_id: int, 
         book_id: str, 
-        store_id: int, 
+        store_id: int,
+        price: int,
         add_stock_level: int, 
     ):
         json = {
             "user_id": user_id,
             "book_id": book_id,
             "store_id": store_id,
+            "price": price,
             "add_stock_level": add_stock_level
         }
         response = self.cli.post("/seller/add_stock_level", json=json)
@@ -220,7 +222,7 @@ def test_add_stock_level():
     seller_info = seller.seller_register()
     store_id = int(uuid1()) % 1000
     seller.create_store(200, seller_info["uid"], store_id)
-    seller.add_stock_level(200, seller_info["uid"], book_id=str(book["id"]), store_id=store_id, add_stock_level=5)
+    seller.add_stock_level(200, seller_info["uid"], book_id=str(book["id"]), store_id=store_id, price=200, add_stock_level=5)
     assert seller.query_stock_level(200, seller_info["uid"], book_id=book["id"], store_id=store_id)["message"] == 5
 
 def test_search():

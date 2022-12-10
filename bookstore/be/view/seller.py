@@ -42,11 +42,12 @@ class AddStockLevelForm(BaseModel):
     user_id: int
     book_id: str
     store_id: int
+    price: int
     add_stock_level: int
 
 @app.post("/add_stock_level")
 async def add_stock_level(form: AddStockLevelForm):
-    code, msg = seller.add_stock_level(form.user_id, form.store_id, form.book_id, form.add_stock_level)
+    code, msg = seller.add_stock_level(form.user_id, form.store_id, form.book_id, form.price, form.add_stock_level)
     return JSONResponse({"message": msg}, code)
 
 class QueryStockLevelForm(BaseModel):
